@@ -9,15 +9,15 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
       :root {
-        --bg: #0f172a;
-        --bg-soft: #020617;
-        --bg-elevated: #020617;
+        --bg: #111827;
+        --bg-soft: #0b1120;
+        --bg-elevated: #0f172a;
         --primary: #2563eb;
-        --primary-soft: rgba(37, 99, 235, 0.15);
-        --accent: #22c55e;
-        --text-main: #e5e7eb;
-        --text-muted: #9ca3af;
-        --border-subtle: #1f2937;
+        --primary-soft: rgba(37, 99, 235, 0.2);
+        --accent: #14b8a6;
+        --text-main: #f1f5f9;
+        --text-muted: #94a3b8;
+        --border-subtle: #334155;
         --danger: #ef4444;
         --warning: #f59e0b;
         --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5),
@@ -489,6 +489,26 @@
         background: rgba(2,6,23,0.65);
       }
 
+      .chart-shell {
+        min-height: 290px;
+        border-radius: 14px;
+        border: 1px solid rgba(71, 85, 105, 0.7);
+        background: linear-gradient(160deg, rgba(15, 23, 42, 0.85), rgba(2, 6, 23, 0.98));
+        padding: 0.5rem;
+        position: relative;
+      }
+
+      .chart-empty {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        pointer-events: none;
+      }
+
       .toast {
         position: fixed;
         right: 1rem;
@@ -944,43 +964,57 @@
         });
       }
 
+      function setSelectOptions(select, values, selectedValue = "") {
+        if (!select) return;
+        select.innerHTML = '<option value="">--Selecciona--</option>';
+        values.forEach((value) => {
+          const opt = document.createElement("option");
+          opt.value = value;
+          opt.textContent = value;
+          select.appendChild(opt);
+        });
+
+        if (selectedValue && values.includes(selectedValue)) {
+          select.value = selectedValue;
+        }
+      }
+
       function updateProductOptions(line) {
         const select = document.getElementById("producto" + line);
         if (!select) return;
         const productos = [...new Set((productosData || []).map((p) => (p.producto || "").trim()).filter(Boolean))];
-        select.innerHTML = '<option value="">--Selecciona--</option>';
-        productos.forEach((p) => {
-          const opt = document.createElement("option");
-          opt.value = p;
-          opt.textContent = p;
-          select.appendChild(opt);
-        });
+        setSelectOptions(select, productos, select.value || "");
       }
 
-      function productoChanged(line) {
-        const producto = document.getElementById("producto" + line)?.value;
+      function productoChanged(line, selectedMarca = "", selectedModelo = "") {
+        const productoSelect = document.getElementById("producto" + line);
+        const producto = productoSelect?.value || "";
         const marcaSelect = document.getElementById("marca" + line);
         const modeloSelect = document.getElementById("modelo" + line);
         if (!marcaSelect || !modeloSelect) return;
 
         const filtered = (productosData || []).filter((p) => !producto || p.producto === producto);
         const marcas = [...new Set(filtered.map((p) => (p.marca || "").trim()).filter(Boolean))];
-        const modelos = [...new Set(filtered.map((p) => (p.modelo || "").trim()).filter(Boolean))];
+        const marcaValue = selectedMarca || marcaSelect.value || "";
 
-        marcaSelect.innerHTML = '<option value="">--Selecciona--</option>';
-        modeloSelect.innerHTML = '<option value="">--Selecciona--</option>';
-        marcas.forEach((m) => {
-          const opt = document.createElement("option");
-          opt.value = m;
-          opt.textContent = m;
-          marcaSelect.appendChild(opt);
+        setSelectOptions(marcaSelect, marcas, marcaValue);
+        marcaChanged(line, selectedModelo);
+      }
+
+      function marcaChanged(line, selectedModelo = "") {
+        const producto = document.getElementById("producto" + line)?.value || "";
+        const marca = document.getElementById("marca" + line)?.value || "";
+        const modeloSelect = document.getElementById("modelo" + line);
+        if (!modeloSelect) return;
+
+        const filtered = (productosData || []).filter((p) => {
+          const sameProducto = !producto || p.producto === producto;
+          const sameMarca = !marca || (p.marca || "").trim() === marca;
+          return sameProducto && sameMarca;
         });
-        modelos.forEach((m) => {
-          const opt = document.createElement("option");
-          opt.value = m;
-          opt.textContent = m;
-          modeloSelect.appendChild(opt);
-        });
+
+        const modelos = [...new Set(filtered.map((p) => (p.modelo || "").trim()).filter(Boolean))];
+        setSelectOptions(modeloSelect, modelos, selectedModelo || modeloSelect.value || "");
       }
 
       function updateProductLines() {
@@ -989,7 +1023,14 @@
           const row = document.getElementById("productRow" + i);
           if (!row) continue;
           row.style.display = i <= count ? "block" : "none";
-          if (i <= count) updateProductOptions(i);
+          if (i <= count) {
+            updateProductOptions(i);
+            productoChanged(i);
+            const marcaSelect = document.getElementById("marca" + i);
+            if (marcaSelect) {
+              marcaSelect.onchange = () => marcaChanged(i);
+            }
+          }
         }
       }
 
@@ -1021,14 +1062,19 @@
         if (!input || !input.value.trim()) return;
         google.script.run
           .withSuccessHandler((res) => {
-            if (!res) return;
             const p = document.getElementById("producto" + line);
-            const ma = document.getElementById("marca" + line);
-            const mo = document.getElementById("modelo" + line);
             const c = document.getElementById("cantidadVendida" + line);
-            if (p) p.value = res.dispositivo || "";
-            if (ma) ma.value = res.marca || "";
-            if (mo) mo.value = res.modelo || "";
+
+            if (!res) {
+              if (c) c.readOnly = false;
+              showToast("No encontramos la serie en inventario.", true);
+              return;
+            }
+
+            if (p) {
+              p.value = res.dispositivo || "";
+              productoChanged(line, res.marca || "", res.modelo || "");
+            }
             if (c) {
               c.value = 1;
               c.readOnly = true;
@@ -1192,11 +1238,25 @@
 
       function updateSalesByPlatformChart(data) {
         const canvas = document.getElementById("chartVentasPlataforma");
+        const empty = document.getElementById("chartVentasPlataformaEmpty");
         if (!canvas) return;
         const ctx = canvas.getContext("2d");
         if (window.chartVentasPlataforma) window.chartVentasPlataforma.destroy();
 
-        const colores = ["#2563eb", "#059669", "#d97706", "#dc2626", "#7c3aed"];
+        const hasData =
+          data &&
+          Array.isArray(data.labels) &&
+          Array.isArray(data.datasets) &&
+          data.datasets.some((dataset) => Array.isArray(dataset.data) && dataset.data.some((v) => Number(v) > 0));
+
+        if (!hasData) {
+          if (empty) empty.style.display = "flex";
+          return;
+        }
+
+        if (empty) empty.style.display = "none";
+
+        const colores = ["#3b82f6", "#14b8a6", "#f59e0b", "#f43f5e", "#8b5cf6"];
 
         data.datasets.forEach((dataset, index) => {
           const color = colores[index % colores.length];
@@ -1227,6 +1287,7 @@
                   usePointStyle: true,
                   padding: 12,
                   font: { size: 11 },
+                  color: "#cbd5e1",
                 },
               },
               title: {
@@ -1248,12 +1309,12 @@
             scales: {
               x: {
                 grid: { display: false },
-                ticks: { maxRotation: 45, minRotation: 45, font: { size: 11 } },
+                ticks: { maxRotation: 45, minRotation: 45, font: { size: 11 }, color: "#cbd5e1" },
               },
               y: {
                 beginAtZero: true,
-                ticks: { stepSize: 1, font: { size: 11 } },
-                grid: { color: "rgba(30,64,175,0.35)" },
+                ticks: { stepSize: 1, font: { size: 11 }, color: "#cbd5e1" },
+                grid: { color: "rgba(51,65,85,0.6)" },
               },
             },
           },
@@ -1969,10 +2030,11 @@
                     </div>
                   </div>
                 </div>
-                <div
-                  style="height:230px;border-radius:14px;border:1px solid rgba(55,65,81,0.85);padding:0.4rem 0.5rem;"
-                >
+                <div class="chart-shell">
                   <canvas id="chartVentasPlataforma"></canvas>
+                  <div id="chartVentasPlataformaEmpty" class="chart-empty" style="display:none;">
+                    Aún no hay ventas registradas para mostrar el gráfico.
+                  </div>
                 </div>
               </div>
 
