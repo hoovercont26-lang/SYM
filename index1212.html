@@ -1,0 +1,3691 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base target="_top">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+     <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --primary-light: #2563eb;
+            --secondary-color: #0f766e;
+            --success-color: #059669;
+            --danger-color: #dc2626;
+            --warning-color: #d97706;
+            --background-color: #f1f5f9;
+            --surface-color: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            height: 60px;
+        }
+
+        .header-bar img {
+            height: 40px;
+            width: auto;
+            margin-right: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .logo img {
+            height: 28px;
+            width: auto;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.375rem 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+
+        .user-info img {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 4rem auto 2rem;
+            padding: 0 1.5rem;
+            width: 100%;
+        }
+
+        .tabs-container {
+            background: var(--surface-color);
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 2px solid transparent;
+            font-size: 0.875rem;
+            position: relative;
+        }
+
+        .tab:hover {
+            color: var(--primary-color);
+            background: rgba(30, 58, 138, 0.05);
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background: rgba(30, 58, 138, 0.05);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 1.5rem;
+            background: var(--surface-color);
+            border-radius: 0 0 0.5rem 0.5rem;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 0.75rem;
+        }
+
+        .product-row {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .product-row h4 {
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.375rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--surface-color);
+            border-radius: 0.5rem;
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .metric-title {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .metric-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .trend-up {
+            color: var(--success-color);
+        }
+
+        .trend-down {
+            color: var(--danger-color);
+        }
+
+        .chart-container {
+            background: var(--surface-color);
+            border-radius: 0.5rem;
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .card {
+            background: var(--surface-color);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.813rem;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            background: var(--surface-color);
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.1);
+        }
+
+        button {
+            padding: 0.625rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-secondary {
+            background: var(--text-secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #374151;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #047857;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #b45309;
+        }
+
+        .btn-info {
+            background: #0ea5e9;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #0284c7;
+        }
+
+        .search-results {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .result-item {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .result-item:hover {
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .result-stock {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .stock-critico {
+            background: #fee2e2;
+            color: var(--danger-color);
+        }
+
+        .stock-normal {
+            background: #dcfce7;
+            color: var(--success-color);
+        }
+
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .result-detail {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .result-detail i {
+            width: 16px;
+            color: var(--primary-color);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--surface-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .data-table th {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .data-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.875rem;
+        }
+
+        .data-table tr:hover {
+            background: rgba(30, 58, 138, 0.02);
+        }
+
+        .stock-bajo {
+            background: #fee2e2;
+            color: var(--danger-color);
+        }
+
+        .stock-medio {
+            background: #fef3c7;
+            color: var(--warning-color);
+        }
+
+        .stock-alto {
+            background: #dcfce7;
+            color: var(--success-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        /* MODAL GENERAL */
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 750px;
+            position: relative;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.10), 0 10px 10px -5px rgba(0,0,0,0.04);
+            margin: 0 auto;
+            animation: modalFadeIn 0.25s;
+        }
+        /* MODAL DE LOGIN */
+        #loginModal .modal-content {
+            max-width: 400px;
+            padding: 2rem 1.5rem;
+        }
+
+        @media (max-width: 600px) {
+          .modal-content {
+            padding: 1rem 0.5rem;
+            max-width: 98vw;
+          }
+          #loginModal .modal-content {
+            max-width: 98vw;
+            padding: 1.2rem 0.5rem;
+          }
+        }
+
+        /* Mejoras visuales para tablas en modales */
+        .modal-content table {
+          border-radius: 8px;
+          overflow: hidden;
+          margin: 0 auto;
+          background: #fff;
+        }
+        .modal-content th, .modal-content td {
+          border: none;
+        }
+        .modal-content th {
+          font-size: 1.05rem;
+          font-weight: 600;
+          letter-spacing: 0.01em;
+        }
+        .modal-content td {
+          font-size: 1rem;
+        }
+
+        .modal-content h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1.25rem;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            background: var(--surface-color);
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .login-button:hover {
+            background: var(--primary-light);
+        }
+
+        .login-error {
+            color: var(--danger-color);
+            font-size: 0.75rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            padding: 0.5rem;
+            background: rgba(220, 38, 38, 0.1);
+            border-radius: 0.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+                margin-top: 3.5rem;
+            }
+
+            .header-bar {
+                padding: 0.5rem 1rem;
+                height: 50px;
+            }
+
+            .logo {
+                font-size: 1rem;
+            }
+
+            .logo img {
+                height: 24px;
+            }
+
+            .user-info {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.75rem;
+            }
+
+            .user-info img {
+                width: 20px;
+                height: 20px;
+            }
+
+            .tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+
+            .tabs::-webkit-scrollbar {
+                display: none;
+            }
+
+            .tab {
+                white-space: nowrap;
+                padding: 0.75rem 1rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .submit-button {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.1), 0 3px 6px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .submit-button:active {
+            transform: translateY(0);
+        }
+
+        /* Estilos para el modal de alerta de bajo stock */
+        .stock-alert-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .stock-alert-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stock-alert-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .stock-alert-header i {
+            font-size: 1.5rem;
+            color: #ef4444;
+        }
+
+        .stock-alert-header h2 {
+            margin: 0;
+            color: #1f2937;
+            font-size: 1.25rem;
+        }
+
+        .stock-alert-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .stock-alert-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .stock-alert-item:last-child {
+            border-bottom: none;
+        }
+
+        .stock-alert-item-info {
+            flex: 1;
+        }
+
+        .stock-alert-item-name {
+            font-weight: 500;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+
+        .stock-alert-item-details {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .stock-alert-item-quantity {
+            font-weight: 600;
+            color: #ef4444;
+            padding: 0.25rem 0.75rem;
+            background: #fee2e2;
+            border-radius: 9999px;
+        }
+
+        .stock-alert-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .stock-alert-button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .stock-alert-button.primary {
+            background: #4f46e5;
+            color: white;
+            border: none;
+        }
+
+        .stock-alert-button.primary:hover {
+            background: #4338ca;
+        }
+
+        .stock-alert-button.secondary {
+            background: white;
+            color: #4b5563;
+            border: 1px solid #d1d5db;
+        }
+
+        .stock-alert-button.secondary:hover {
+            background: #f3f4f6;
+        }
+
+        .alert-container {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .alert-item {
+            background: #fff;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .alert-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .alert-item.low-stock {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .alert-item-info {
+            flex: 1;
+        }
+
+        .alert-item-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-item-details {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .alert-item-quantity {
+            font-weight: 600;
+            color: var(--danger-color);
+            padding: 0.25rem 0.75rem;
+            background: #fee2e2;
+            border-radius: 9999px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .section h3 {
+            color: var(--text-primary);
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+    </style>
+    <script>
+      var productosData = [];
+      
+      // Función para habilitar o deshabilitar todos los controles de un contenedor
+      function setSectionDisabled(sectionId, disabled) {
+         var section = document.getElementById(sectionId);
+         if (section) {
+            var inputs = section.querySelectorAll("input, select, textarea");
+            inputs.forEach(function(el) {
+              el.disabled = disabled;
+              // Si está deshabilitado, remover required para evitar errores de validación
+              if (disabled) {
+                el.removeAttribute('required');
+              } else {
+                // Si está habilitado y era required originalmente, restaurarlo
+                if (el.hasAttribute('data-original-required')) {
+                  el.setAttribute('required', '');
+                }
+              }
+            });
+         }
+      }
+
+      var currentUser = null;
+
+function login() {
+  var username = document.getElementById("loginUser").value.trim();
+  var password = document.getElementById("loginPass").value.trim();
+  
+  document.getElementById("loginError").style.display = "none";
+  
+  if (!username || !password) {
+    document.getElementById("loginError").textContent = "Por favor, completa ambos campos.";
+    document.getElementById("loginError").style.display = "block";
+    return;
+  }
+  
+  google.script.run.withSuccessHandler(function(userData) {
+    currentUser = userData;
+    document.getElementById("welcomeMessage").textContent = "Bienvenido " + userData.name;
+    
+    const loginModal = document.getElementById("loginModal");
+    loginModal.classList.remove("active");
+    
+    const mainInterface = document.getElementById("mainInterface");
+    mainInterface.classList.add("active");
+    
+    document.querySelectorAll('.tab-content').forEach(content => {
+      content.classList.remove('active');
+    });
+    document.getElementById('dashboardTab').classList.add('active');
+    
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.classList.remove('active');
+    });
+    document.querySelector('.tab[onclick*="dashboardTab"]').classList.add('active');
+    
+    configurarAccesos(userData.rol);
+    
+    // Cargar el tab de stock en segundo plano
+    google.script.run
+      .withSuccessHandler(function(stockData) {
+        if (stockData && Array.isArray(stockData)) {
+          const lowStockItems = stockData.filter(item => parseInt(item.cantidad) < 10);
+          if (lowStockItems.length > 0) {
+            showStockAlert(lowStockItems);
+          }
+        }
+      })
+      .getStockActual("");
+    
+    // Cargar el resto de los datos
+    google.script.run
+      .withSuccessHandler(function(data) {
+        productosData = data;
+        updateRegistroProductOptions();
+        updateLugarOptions();
+        updateProductLines();
+        updatePlataformaOptions();
+        actualizarFiltrosDispositivos();
+        llenarFiltroMeses();
+        updateDashboardMetrics();
+        
+        // Configurar búsqueda en tiempo real
+        configurarBusquedaTiempoReal();
+      })
+      .getProductosData();
+  })
+  .withFailureHandler(function(error) {
+    document.getElementById("loginError").textContent = error.message;
+    document.getElementById("loginError").style.display = "block";
+  })
+  .loginUser(username, password);
+}
+
+function configurarAccesos(rol) {
+  // Para el rol Lector, solo mostramos Stock y Historial.
+  // Para EDIT, permitimos Movimientos y Carga Masiva.
+  // ADMIN y los demás roles tienen acceso a todos los tabs.
+  if (rol === "Lector") {
+    // Ocultar tab de Movimientos y Carga Masiva
+    var movimientoTab = document.querySelector(".tab[onclick*='formularioTab']");
+    var cargaTab = document.querySelector(".tab[onclick*='cargaMasiva']");
+    if (movimientoTab) movimientoTab.style.display = "none";
+    if (cargaTab) cargaTab.style.display = "none";
+  }
+  // Si deseas aplicar más restricciones (por ejemplo, deshabilitar botones de cancelar o edición), puedes hacerlo aquí.
+}
+
+      
+      function onLoad() {
+    // Primero cargar fechas
+    setFechas();
+    
+    // Marcar campos required originales
+    marcarCamposRequiredOriginales();
+    
+    // Asegurar que los campos ocultos no tengan required
+    asegurarCamposOcultosSinRequired();
+    
+    // Preparar formulario para envío
+    prepararFormularioParaEnvio();
+    
+    // Luego cargar datos
+    google.script.run
+        .withSuccessHandler(function(data){
+            productosData = data;
+            updateRegistroProductOptions();
+            updateLugarOptions();
+            updateProductLines();
+            updatePlataformaOptions();
+            actualizarFiltrosDispositivos();
+            
+            llenarFiltroMeses(); // Cambiado de actualizarFiltrosMeses a llenarFiltroMeses
+            updateDashboardMetrics();
+            
+            // Configurar búsqueda en tiempo real
+            configurarBusquedaTiempoReal();
+            
+            // Forzar actualización visual
+            setTimeout(setFechas, 1000);
+        })
+        .getProductosData();
+}
+
+      // Función para marcar los campos required originales
+      function marcarCamposRequiredOriginales() {
+        var form = document.getElementById("myForm");
+        if (form) {
+          var requiredFields = form.querySelectorAll("[required]");
+          requiredFields.forEach(function(field) {
+            field.setAttribute('data-original-required', 'true');
+          });
+        }
+      }
+      
+      // Función para asegurar que los campos ocultos no tengan required
+      function asegurarCamposOcultosSinRequired() {
+        var ventaSection = document.getElementById("ventaFields");
+        var registroSection = document.getElementById("registroFields");
+        
+        [ventaSection, registroSection].forEach(function(section) {
+          if (section && section.style.display === "none") {
+            var fields = section.querySelectorAll("input, select, textarea");
+            fields.forEach(function(field) {
+              field.removeAttribute('required');
+            });
+          }
+        });
+      }
+      
+      // Función para preparar el formulario para envío
+      function prepararFormularioParaEnvio() {
+        var form = document.getElementById("myForm");
+        if (!form) return;
+        
+        // Remover required de todos los campos deshabilitados o en secciones ocultas
+        var allFields = form.querySelectorAll("input, select, textarea");
+        allFields.forEach(function(field) {
+          var parentSection = field.closest('#ventaFields, #registroFields');
+          if (field.disabled || (parentSection && parentSection.style.display === "none")) {
+            field.removeAttribute('required');
+          }
+        });
+        
+        // También remover required de campos específicos que no están en secciones
+        var tipoMovimientoField = document.getElementById("tipoMovimiento");
+        if (tipoMovimientoField && !tipoMovimientoField.value) {
+          tipoMovimientoField.removeAttribute('required');
+        }
+      }
+      
+      // Función para limpiar validación de campos ocultos
+      function limpiarValidacionCamposOcultos() {
+        var ventaSection = document.getElementById("ventaFields");
+        var registroSection = document.getElementById("registroFields");
+        var tipoMovimiento = document.getElementById("tipoMovimiento").value;
+        
+        // Remover required de todos los campos ocultos o deshabilitados
+        var allSections = [ventaSection, registroSection];
+        allSections.forEach(function(section) {
+          if (section) {
+            var allFields = section.querySelectorAll("input, select, textarea");
+            allFields.forEach(function(field) {
+              // Si el campo está deshabilitado o la sección está oculta, remover required
+              if (field.disabled || section.style.display === "none") {
+                field.removeAttribute('required');
+              }
+            });
+          }
+        });
+        
+        // También remover required de campos específicos que no están en secciones
+        var tipoMovimientoField = document.getElementById("tipoMovimiento");
+        if (tipoMovimientoField && !tipoMovimientoField.value) {
+          tipoMovimientoField.removeAttribute('required');
+        }
+      }
+
+        // Funcionalidad de Tabs
+        function openTab(evt, tabName) {
+            var tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(function(content) {
+                content.classList.remove('active');
+            });
+            
+            var tabs = document.querySelectorAll('.tab');
+            tabs.forEach(function(tab) {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
+            
+            // Cargar datos dinámicamente
+            if(tabName === 'stockTab') loadStock();
+            if(tabName === 'historialTab') loadHistorial();
+        }
+
+        // Cargar Stock
+        function loadStock() {
+  const dispositivo = document.getElementById("filtroDispositivo").value;
+  google.script.run
+    .withSuccessHandler(stock => {
+      const table = document.getElementById("stockTable");
+      table.innerHTML = `
+        <tr>
+          <th>Dispositivo</th>
+          <th>Marca</th>
+          <th>Modelo</th>
+          <th>Cantidad Total</th>
+        </tr>
+      `;
+      stock.forEach(item => {
+        const row = table.insertRow();
+        row.innerHTML = `
+          <td>${item.dispositivo}</td>
+          <td>${item.marca}</td>
+          <td>${item.modelo}</td>
+          <td>${item.cantidad}</td>
+        `;
+        if (item.cantidad < 10) {
+          row.classList.add("stock-bajo");
+        }
+        // Evento de clic para mostrar descripción
+        row.style.cursor = 'pointer';
+        row.addEventListener('click', function() {
+          mostrarDescripcionStock(item.dispositivo, item.marca, item.modelo);
+        });
+      });
+    })
+    .withFailureHandler(function(error) {
+      console.error("Error al cargar stock:", error);
+      mostrarModal("Error al cargar stock: " + error.message);
+    })
+    .getStockActual(dispositivo);
+}
+
+        // Cargar Historial
+        function loadHistorial() {
+  var tipo = document.getElementById("filtroTipo").value;
+  var mes = document.getElementById("filtroMes").value;
+  google.script.run
+    .withSuccessHandler(function(historial) {
+      const table = document.getElementById("historialTable");
+      while(table.rows.length > 1) table.deleteRow(1);
+      historial.forEach(mov => {
+        let fecha = mov.fecha;
+        if (fecha instanceof Date) {
+          fecha = Utilities.formatDate(fecha, Session.getScriptTimeZone(), "dd/MM/yyyy HH:mm:ss");
+        }
+        const row = table.insertRow();
+        row.innerHTML = `
+          <td>${fecha}</td>
+          <td>${mov.tipo}</td>
+          <td>${mov.producto}</td>
+          <td>${mov.cantidad}</td>
+          <td>${mov.numeroVenta}</td>
+          <td>${mov.lugar}</td>
+          <td>${mov.plataforma}</td>
+          <td>
+                ${mov.tipo === "Cancelado" 
+                    ? 'Cancelado' 
+                    : (mov.tipo === "Venta" 
+                        ? `<button onclick="cancelarMovimiento('${mov.id}')" class="btn-cancelar">Cancelar</button>`
+                        : '')
+                }
+            </td>
+        `;
+        // Agregar evento de clic a la fila para mostrar detalles
+        row.style.cursor = 'pointer';
+        row.addEventListener('click', function(e) {
+          // Evitar que el clic en el botón cancelar dispare el modal
+          if (e.target.tagName === 'BUTTON') return;
+          mostrarDetalleMovimiento(mov.id);
+        });
+      });
+    })
+    .getHistorialMovimientos(tipo, mes);
+}
+
+function validarSerieEnRegistro() {
+  const serie = document.getElementById("serieRegistro").value.trim();
+  if (serie === "") return true; // Si no hay serie, no hay problema
+
+  return new Promise((resolve, reject) => {
+    google.script.run
+      .withSuccessHandler((esUnica) => {
+        if (esUnica) {
+          resolve(true); // La serie es única
+        } else {
+          mostrarModal(`La serie ${serie} ya existe en el inventario.`);
+          resolve(false); // La serie ya existe
+        }
+      })
+      .withFailureHandler((error) => {
+        mostrarModal("Error al validar la serie: " + error.message);
+        reject(error);
+      })
+      .validarSerieUnica(serie);
+  });
+}
+
+function cancelarMovimiento(id) {
+  if (confirm("¿Estás seguro de cancelar este movimiento?")) {
+    google.script.run
+      .withSuccessHandler(() => {
+        mostrarModal("Movimiento cancelado exitosamente");
+        loadHistorial();
+        loadStock();
+      })
+      .withFailureHandler((error) => {
+        mostrarModal("Error: " + error.message);
+      })
+      .cancelarMovimiento(id);
+  }
+}
+      
+      // Establece la fecha actual en los campos de Venta y Registro.
+      function setFechas() {
+    const now = new Date();
+    const options = { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    };
+    
+    const formattedDate = now.toLocaleString('es-ES', options);
+    
+    // Actualizar ambos campos de fecha
+    const fechaVenta = document.getElementById("fechaVenta");
+    const fechaRegistro = document.getElementById("fechaRegistro");
+    
+    if(fechaVenta) fechaVenta.value = formattedDate;
+    if(fechaRegistro) fechaRegistro.value = formattedDate;
+}
+      
+      // Actualiza el select "Lugar" con las opciones únicas de la columna D de Productos.
+      function updateLugarOptions() {
+         var select = document.getElementById("lugar");
+         if (!select) return;
+         select.innerHTML = "";
+         var defaultOption = document.createElement("option");
+         defaultOption.value = "";
+         defaultOption.text = "--Selecciona--";
+         select.appendChild(defaultOption);
+         
+         var uniqueLugares = [];
+         productosData.forEach(function(item) {
+            if(item.lugar && uniqueLugares.indexOf(item.lugar) === -1){
+                uniqueLugares.push(item.lugar);
+            }
+         });
+         uniqueLugares.forEach(function(l){
+            var opt = document.createElement("option");
+            opt.value = l;
+            opt.text = l;
+            select.appendChild(opt);
+         });
+      }
+      function updatePlataformaOptions() {
+         var select = document.getElementById("plataforma");
+         if (!select) return;
+         select.innerHTML = "";
+         var defaultOption = document.createElement("option");
+         defaultOption.value = "";
+         defaultOption.text = "--Selecciona--";
+         select.appendChild(defaultOption);
+         
+         var uniquePlataforma = [];
+         productosData.forEach(function(item) {
+            if(item.plataforma && uniquePlataforma.indexOf(item.plataforma) === -1){
+                uniquePlataforma.push(item.plataforma);
+            }
+         });
+         uniquePlataforma.forEach(function(pla){
+            var opt = document.createElement("option");
+            opt.value = pla;
+            opt.text = pla;
+            select.appendChild(opt);
+         });
+      }
+      
+      // ----- Funciones para la opción Venta -----
+      
+      // Llena el select "producto" (columna A global) para la línea indicada.
+      function updateProductOptions(line) {
+          var select = document.getElementById("producto" + line);
+          if(!select) return;
+          select.innerHTML = "";
+          var defaultOption = document.createElement("option");
+          defaultOption.value = "";
+          defaultOption.text = "--Selecciona--";
+          select.appendChild(defaultOption);
+          
+          var uniqueProductos = [];
+          productosData.forEach(function(item) {
+              if(uniqueProductos.indexOf(item.producto) === -1) {
+                  uniqueProductos.push(item.producto);
+              }
+          });
+          uniqueProductos.forEach(function(prod){
+             var opt = document.createElement("option");
+             opt.value = prod;
+             opt.text = prod;
+             select.appendChild(opt);
+          });
+      }
+      
+      // Llena globalmente los selects de "marca" y "modelo" para la línea indicada.
+      function productoChanged(line) {
+         var marcaSelect = document.getElementById("marca" + line);
+         var modeloSelect = document.getElementById("modelo" + line);
+         if(!marcaSelect || !modeloSelect) return;
+         marcaSelect.innerHTML = "";
+         modeloSelect.innerHTML = "";
+         var defaultOption = document.createElement("option");
+         defaultOption.value = "";
+         defaultOption.text = "--Selecciona--";
+         marcaSelect.appendChild(defaultOption);
+         modeloSelect.appendChild(defaultOption.cloneNode(true));
+         
+         var uniqueMarcas = [];
+         var uniqueModelos = [];
+         productosData.forEach(function(item) {
+             if(uniqueMarcas.indexOf(item.marca) === -1) {
+                 uniqueMarcas.push(item.marca);
+             }
+             if(uniqueModelos.indexOf(item.modelo) === -1) {
+                 uniqueModelos.push(item.modelo);
+             }
+         });
+         uniqueMarcas.forEach(function(m){
+             var opt = document.createElement("option");
+             opt.value = m;
+             opt.text = m;
+             marcaSelect.appendChild(opt);
+         });
+         uniqueModelos.forEach(function(m){
+             var opt = document.createElement("option");
+             opt.value = m;
+             opt.text = m;
+             modeloSelect.appendChild(opt);
+         });
+         const isVisible = document.getElementById("productRow" + line).style.display !== "none";
+    marcaSelect.required = isVisible;
+    modeloSelect.required = isVisible;
+      }
+      
+      // Si se ingresa una serie en Venta, busca en Inventario y autocompleta Producto, Marca y Modelo.
+      function buscarSerie(line) {
+         var serieInput = document.getElementById("serie" + line);
+         var serieValue = serieInput.value.trim();
+         if(serieValue === ""){
+           return;
+         }
+         google.script.run.withSuccessHandler(function(result){
+             if(result){
+               document.getElementById("producto" + line).value = result.dispositivo;
+               productoChanged(line);
+               setTimeout(function(){
+                 document.getElementById("marca" + line).value = result.marca;
+                 document.getElementById("modelo" + line).value = result.modelo;
+               }, 200);
+             } else {
+               mostrarModal("No se encontró producto con esa serie.");
+             }
+         }).buscarProductoPorSerie(serieValue);
+      }
+      
+      // Muestra u oculta las filas de producto según el número de líneas seleccionadas.
+      // Además, deshabilita los controles en las filas ocultas para que no participen en la validación.
+      function updateProductLines() {
+    var num = parseInt(document.getElementById("cantidadProductos").value);
+    
+    for(var i = 1; i <= 5; i++){
+        var row = document.getElementById("productRow" + i);
+        var inputs = row.querySelectorAll("input, select, textarea");
+        
+        // Obtener los selects específicos
+        const productoSelect = document.getElementById("producto" + i);
+        const marcaSelect = document.getElementById("marca" + i);
+        const modeloSelect = document.getElementById("modelo" + i);
+
+        if(i <= num){
+            row.style.display = "block";
+            inputs.forEach(el => el.disabled = false);
+            
+            // Agregar required solo a campos visibles
+            productoSelect.required = true;
+            marcaSelect.required = true;
+            modeloSelect.required = true;
+            
+            updateProductOptions(i);
+            productoChanged(i);
+        } else {
+            row.style.display = "none";
+            inputs.forEach(el => el.disabled = true);
+            
+            // Remover required de campos ocultos
+            productoSelect.required = false;
+            marcaSelect.required = false;
+            modeloSelect.required = false;
+        }
+    }
+}
+      // ----- Funciones para la opción Registro -----
+      
+      // Llena el select "dispositivo" en Registro (global, columna A).
+      function updateRegistroProductOptions() {
+          var select = document.getElementById("dispositivoRegistro");
+          if(!select) return;
+          select.innerHTML = "";
+          var defaultOption = document.createElement("option");
+          defaultOption.value = "";
+          defaultOption.text = "--Selecciona--";
+          select.appendChild(defaultOption);
+          var uniqueProductos = [];
+          productosData.forEach(function(item) {
+             if(uniqueProductos.indexOf(item.producto) === -1){
+                 uniqueProductos.push(item.producto);
+             }
+          });
+          uniqueProductos.forEach(function(prod) {
+             var opt = document.createElement("option");
+             opt.value = prod;
+             opt.text = prod;
+             select.appendChild(opt);
+          });
+      }
+      
+      // Cuando se cambia el dispositivo en Registro, llena globalmente los selects de "marca" y "modelo".
+      function registroProductoChanged() {
+          var marcaSelect = document.getElementById("marcaRegistro");
+          var modeloSelect = document.getElementById("modeloRegistro");
+          if(!marcaSelect || !modeloSelect) return;
+          marcaSelect.innerHTML = "";
+          modeloSelect.innerHTML = "";
+          var defaultOption = document.createElement("option");
+          defaultOption.value = "";
+          defaultOption.text = "--Selecciona--";
+          marcaSelect.appendChild(defaultOption);
+          modeloSelect.appendChild(defaultOption.cloneNode(true));
+          
+          var uniqueMarcas = [];
+          var uniqueModelos = [];
+          productosData.forEach(function(item) {
+             if(uniqueMarcas.indexOf(item.marca) === -1) {
+                 uniqueMarcas.push(item.marca);
+             }
+             if(uniqueModelos.indexOf(item.modelo) === -1) {
+                 uniqueModelos.push(item.modelo);
+             }
+          });
+          uniqueMarcas.forEach(function(m){
+             var opt = document.createElement("option");
+             opt.value = m;
+             opt.text = m;
+             marcaSelect.appendChild(opt);
+          });
+          uniqueModelos.forEach(function(m){
+             var opt = document.createElement("option");
+             opt.value = m;
+             opt.text = m;
+             modeloSelect.appendChild(opt);
+          });
+      }
+      
+      // ----- Envío del Formulario -----
+      
+      function submitForm() {
+         event.preventDefault();
+         
+         // Preparar formulario para envío - remover required de campos ocultos/deshabilitados
+         prepararFormularioParaEnvio();
+         
+         var tipoMovimiento = document.getElementById("tipoMovimiento").value;
+         
+         // Validar que se haya seleccionado un tipo de movimiento
+         if (!tipoMovimiento) {
+           mostrarModal("Por favor, selecciona un tipo de movimiento.");
+           document.getElementById("tipoMovimiento").focus();
+           return false;
+         }
+         
+         if(tipoMovimiento === "Venta") {
+           // Validar campos requeridos para venta
+           var camposVenta = ["plataforma", "numeroVenta", "cantidadProductos", "lugar", "boletaFactura"];
+           for (var i = 0; i < camposVenta.length; i++) {
+             var campo = document.getElementById(camposVenta[i]);
+             if (!campo.value.trim()) {
+               mostrarModal("Por favor, completa todos los campos obligatorios de la venta.");
+               campo.focus();
+               return false;
+             }
+           }
+           
+           var formData = {};
+           formData.tipoMovimiento = tipoMovimiento;
+           formData.plataforma = document.getElementById("plataforma").value;
+           formData.numeroVenta = document.getElementById("numeroVenta").value;
+           formData.cantidadProductos = document.getElementById("cantidadProductos").value;
+           var totalGlobal = 0;
+           for(var i = 1; i <= 5; i++){
+             var row = document.getElementById("productRow" + i);
+             if(row.style.display !== "none"){
+               formData["producto" + i] = document.getElementById("producto" + i).value;
+               formData["marca" + i] = document.getElementById("marca" + i).value;
+               formData["modelo" + i] = document.getElementById("modelo" + i).value;
+               formData["serie" + i] = document.getElementById("serie" + i).value;
+               formData["cantidadVendida" + i] = document.getElementById("cantidadVendida" + i).value;
+               totalGlobal += parseInt(formData["cantidadVendida" + i]) || 0;
+             }
+           }
+           formData.totalGlobal = totalGlobal;
+           formData.lugar = document.getElementById("lugar").value;
+           formData.boletaFactura = document.getElementById("boletaFactura").value;
+           
+           google.script.run
+            .withSuccessHandler(function(response){
+                // Resetear formulario
+                document.getElementById("myForm").reset();
+                
+                // Actualizar fechas inmediatamente
+                setFechas();
+                
+                // Actualizar datos
+                google.script.run
+                    .withSuccessHandler(function(data){
+                        productosData = data;
+                        updateRegistroProductOptions();
+                        updateLugarOptions();
+                        updateProductLines();
+                        toggleFields();
+                    })
+                    .getProductosData();
+                
+                mostrarModal(response);
+            })
+            .withFailureHandler(function(error){
+                mostrarModal("Error: " + error.message);
+            })
+            .registrarMovimiento(formData);
+    } 
+          else if(tipoMovimiento === "Registro") {
+           // Validar campos requeridos para registro
+           var camposRegistro = ["dispositivoRegistro", "marcaRegistro", "modeloRegistro", "descripcionRegistro", "cantidadRegistro"];
+           for (var i = 0; i < camposRegistro.length; i++) {
+             var campo = document.getElementById(camposRegistro[i]);
+             if (!campo.value.trim()) {
+               mostrarModal("Por favor, completa todos los campos obligatorios del registro.");
+               campo.focus();
+               return false;
+             }
+           }
+           
+           var formData = {};
+           formData.serie = document.getElementById("serieRegistro").value;
+           formData.dispositivo = document.getElementById("dispositivoRegistro").value;
+           formData.marca = document.getElementById("marcaRegistro").value;
+           formData.modelo = document.getElementById("modeloRegistro").value;
+           formData.descripcion = document.getElementById("descripcionRegistro").value;
+           formData.cantidad = document.getElementById("cantidadRegistro").value;
+           
+           google.script.run
+      .withSuccessHandler((response) => {
+        mostrarModal(response);
+        document.getElementById("myForm").reset();
+        setFechas();
+        loadHistorial();
+        loadStock();
+      })
+      .withFailureHandler((error) => {
+        mostrarModal("Error: " + error.message);
+      })
+      .registrarProducto(formData);
+  } else {
+    mostrarModal("Selecciona un tipo de movimiento válido.");
+  }
+  return false;
+}
+      function reiniciarLineasVenta() {
+    document.getElementById("cantidadProductos").value = "1";
+    updateProductLines(); // Mostrar solo 1 línea inicial
+}
+      // Función para mostrar u ocultar las secciones y habilitar/deshabilitar controles.
+      function toggleFields() {
+         var tipoMovimiento = document.getElementById("tipoMovimiento").value;
+         var ventaSection = document.getElementById("ventaFields");
+         var registroSection = document.getElementById("registroFields");
+         if(tipoMovimiento === "Venta"){
+           ventaSection.style.display = "block";
+           registroSection.style.display = "none";
+           setSectionDisabled("ventaFields", false);
+           setSectionDisabled("registroFields", true);
+         } else if(tipoMovimiento === "Registro"){
+           ventaSection.style.display = "none";
+           registroSection.style.display = "block";
+           setSectionDisabled("ventaFields", true);
+           setSectionDisabled("registroFields", false);
+         } else {
+           ventaSection.style.display = "none";
+           registroSection.style.display = "none";
+           setSectionDisabled("ventaFields", true);
+           setSectionDisabled("registroFields", true);
+         }
+         
+         // Asegurar que los campos ocultos no tengan required
+         asegurarCamposOcultosSinRequired();
+         
+         if(tipoMovimiento === "Venta") {
+        reiniciarLineasVenta();
+    }
+      }
+      
+      function descargarPlantilla() {
+      const csvContent = "Serie,Dispositivo,Marca,Modelo,Descripción,Cantidad\n";
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute("href", url);
+      link.setAttribute("download", "plantilla_carga.csv");
+      link.click();
+      URL.revokeObjectURL(url);
+}
+
+// ========== Filtros Stock ==========
+function actualizarFiltrosDispositivos() {
+    google.script.run.withSuccessHandler(dispositivos => {
+        const select = document.getElementById('filtroDispositivo');
+        select.innerHTML = '<option value="">Todos los Dispositivos</option>';
+        dispositivos.forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d;
+            opt.text = d;
+            select.appendChild(opt);
+        });
+    }).getDispositivosUnicos();
+}
+
+// ========== Filtros Historial ==========
+function llenarFiltroMeses() {
+    var select = document.getElementById("filtroMes");
+    if (!select) return;
+    
+    select.innerHTML = '<option value="">Todos los Meses</option>';
+    var meses = [
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
+    
+    meses.forEach((nombreMes, index) => {
+        var option = document.createElement("option");
+        option.value = index + 1;
+        option.text = nombreMes;
+        select.appendChild(option);
+    });
+}
+
+function descargarHistorial() {
+    google.script.run.withSuccessHandler(csv => {
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute("href", url);
+            link.setAttribute("download", "historial.csv");
+            link.click();
+            URL.revokeObjectURL(url);
+        })
+        .exportarHistorialCSV();
+}
+
+function mostrarModal(mensaje) {
+  const modal = document.getElementById('alertModal');
+  const msg = document.getElementById('modalMessage');
+  msg.innerHTML = mensaje;
+  modal.classList.add('active');
+  modal.querySelector('.close-modal').onclick = function() {
+    modal.classList.remove('active');
+  };
+}
+
+// Funciones para el dashboard
+function updateDashboardMetrics() {
+    // Actualizar métricas básicas
+    google.script.run
+        .withSuccessHandler(function(metricas) {
+            if (metricas) {
+                document.getElementById('totalStock').textContent = metricas.totalStock || '0';
+                document.getElementById('lowStock').textContent = metricas.lowStock || '0';
+                document.getElementById('monthlyMovements').textContent = metricas.movimientosMes || '0';
+                document.getElementById('inventoryValue').textContent = '$' + (metricas.valorInventario || '0');
+            }
+        })
+        .obtenerMetricasDashboard();
+
+    // Actualizar estadísticas detalladas del inventario
+    google.script.run
+        .withSuccessHandler(function(stats) {
+            if (stats) {
+                document.getElementById('productosConSerie').textContent = stats.productosConSerie || '0';
+                document.getElementById('marcasUnicas').textContent = stats.marcasUnicas || '0';
+                
+                // Actualizar tendencias
+                document.getElementById('totalStockTrend').textContent = `${stats.totalUnidades} unidades totales`;
+                document.getElementById('lowStockTrend').textContent = `${stats.stockBajo} productos críticos`;
+                document.getElementById('monthlyMovementsTrend').textContent = 'Movimientos del mes actual';
+                document.getElementById('inventoryValueTrend').textContent = `$${stats.valorEstimado.toLocaleString()}`;
+                document.getElementById('productosConSerieTrend').textContent = `${stats.productosSinSerie} sin serie`;
+                document.getElementById('marcasUnicasTrend').textContent = `${stats.dispositivosUnicos} dispositivos únicos`;
+            }
+        })
+        .obtenerEstadisticasInventario();
+
+    // Actualizar gráfico de ventas por plataforma
+    google.script.run
+        .withSuccessHandler(data => {
+            if (data && data.labels && data.datasets) {
+                updateSalesByPlatformChart(data);
+            }
+        })
+        .obtenerVentasPorMesYPlataforma();
+        
+    // Actualizar tabla de resumen de ventas
+    google.script.run
+        .withSuccessHandler(data => {
+            updateSalesSummaryTable(data);
+        })
+        .obtenerVentasPorPlataforma();
+}
+
+function updateSalesSummaryTable(data) {
+    const tableContainer = document.getElementById('salesSummaryTable');
+    if (!tableContainer) return;
+    
+    let html = `
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Plataforma</th>
+                    <th>Ventas Totales</th>
+                    <th>Cancelaciones</th>
+                    <th>Neto</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    if (Array.isArray(data)) {
+        data.forEach(item => {
+            html += `
+                <tr>
+                    <td>${item.plataforma || ''}</td>
+                    <td>${item.ventasTotales || 0}</td>
+                    <td>${item.cancelaciones || 0}</td>
+                    <td>${item.neto || 0}</td>
+                </tr>
+            `;
+        });
+    }
+    
+    html += '</tbody></table>';
+    tableContainer.innerHTML = html;
+}
+
+function updateSalesByPlatformChart(data) {
+    const ctx = document.getElementById('salesByPlatformChart').getContext('2d');
+    if (window.platformChart) window.platformChart.destroy();
+    
+    // Paleta de colores para las líneas
+    const colores = [
+        '#2563eb', // Azul
+        '#059669', // Verde
+        '#d97706', // Naranja
+        '#dc2626', // Rojo
+        '#7c3aed'  // Púrpura
+    ];
+    
+    // Configurar datasets con estilos
+    data.datasets.forEach((dataset, index) => {
+        const color = colores[index % colores.length];
+        dataset.borderColor = color;
+        dataset.backgroundColor = color + '20';
+        dataset.borderWidth = 2;
+        dataset.pointRadius = 4;
+        dataset.pointHoverRadius = 6;
+        dataset.pointBackgroundColor = color;
+        dataset.pointHoverBackgroundColor = '#ffffff';
+        dataset.pointBorderColor = '#ffffff';
+        dataset.pointHoverBorderColor = color;
+        dataset.fill = true;
+        dataset.tension = 0.4;
+    });
+
+    window.platformChart = new Chart(ctx, {
+        type: 'line',
+        data: data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15,
+                        font: {
+                            size: 11
+                        }
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Ventas por Mes y Plataforma',
+                    font: { 
+                        size: 16,
+                        weight: 'bold'
+                    },
+                    padding: 20
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    titleColor: '#1e293b',
+                    bodyColor: '#1e293b',
+                    borderColor: '#e2e8f0',
+                    borderWidth: 1,
+                    padding: 10,
+                    displayColors: true,
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${context.parsed.y} ventas`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45,
+                        font: {
+                            size: 11
+                        }
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: { 
+                        stepSize: 1,
+                        font: {
+                            size: 11
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(226, 232, 240, 0.5)'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function updateCategoryDistributionChart(data) {
+    const ctx = document.getElementById('categoryDistributionChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: data.labels,
+            datasets: [{
+                data: data.values,
+                backgroundColor: [
+                    '#1e3a8a',
+                    '#2563eb',
+                    '#0f766e',
+                    '#059669',
+                    '#d97706'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+function checkLowStock() {
+  console.log("Verificando stock bajo (global)..."); // Debug
+  google.script.run
+    .withSuccessHandler(function(stockData) {
+      console.log("Datos de stock recibidos (global):", stockData); // Debug
+      if (!stockData || !Array.isArray(stockData)) {
+        console.error("Datos de stock inválidos:", stockData);
+        return;
+      }
+      
+      // Filtra ítems con stock bajo del stock GLOBAL
+      const lowStockItems = stockData.filter(item => item.cantidad < 10);
+      console.log("Items con stock bajo (global):", lowStockItems); // Debug
+      
+      const modal = document.getElementById('stockAlertModal');
+
+      // Lógica para mostrar/ocultar el modal de alerta
+      if (lowStockItems.length > 0) {
+        // Si hay ítems con stock bajo y el modal NO está visible, mostrarlo
+        if (!modal || modal.style.display !== 'flex') {
+             showStockAlert(lowStockItems); // Muestra el modal con la lista global
+        } else {
+             // Si el modal ya está visible, podrías optar por actualizar su lista
+             // actualmente showStockAlert ya lo hace. No necesitas llamar showStockAlert de nuevo
+             // si ya está visible, a menos que quieras forzar una actualización (redundante).
+             // showStockAlert(lowStockItems); // Podrías llamar de nuevo si quieres asegurar que la lista está actualizada
+        }
+        // Opcional: Mostrar alertas en la sección del dashboard
+        updateDashboardLowStockAlerts(lowStockItems); // Tendrías que implementar esta función
+
+      } else {
+        // Si no hay ítems con stock bajo, asegúrate de que el modal esté oculto
+        if (modal && modal.style.display === 'flex') {
+           closeStockAlert();
+        }
+        // Opcional: Limpiar la sección del dashboard si no hay alertas
+        // clearDashboardLowStockAlerts(); // Tendrías que implementar esta función
+      }
+    })
+    .withFailureHandler(function(error) {
+      console.error("Error al verificar stock (global):", error); // Debug
+      // No mostrar un modal de error por esto, ya que podría ser menos crítico
+      // que el error de carga de stock principal.
+    })
+    .getStockActual(""); // Llama a GS para obtener TODO el stock
+}
+
+function showStockAlert(items) {
+  const alertList = document.getElementById('stockAlertList');
+  const modal = document.getElementById('stockAlertModal');
+  
+  if (!alertList || !modal) {
+    console.error("Error: Elementos del modal de alerta no encontrados.");
+    return;
+  }
+  
+  // Verificar si el modal ya se mostró anteriormente
+  if (modal.dataset.shown === 'true') {
+    return; // Si ya se mostró, no lo mostramos de nuevo
+  }
+  
+  alertList.innerHTML = ''; // Limpiar lista actual
+  
+  if (!items || items.length === 0) {
+    closeStockAlert();
+    return;
+  }
+  
+  // Llenar la lista con los items con bajo stock
+  items.forEach(item => {
+    const li = document.createElement('li');
+    li.className = 'stock-alert-item';
+    li.innerHTML = `
+      <div class="stock-alert-item-info">
+        <div class="stock-alert-item-name">${item.dispositivo}</div>
+        <div class="stock-alert-item-details">${item.marca} ${item.modelo}</div>
+      </div>
+      <div class="stock-alert-item-quantity">${item.cantidad} unidades</div>
+    `;
+    alertList.appendChild(li);
+  });
+  
+  // Mostrar el modal y marcar como mostrado
+  modal.style.display = 'flex';
+  modal.dataset.shown = 'true';
+}
+
+function closeStockAlert() {
+  const modal = document.getElementById('stockAlertModal');
+  if (modal) {
+    modal.style.display = 'none'; // Oculta el modal
+    // Si usas clase: modal.classList.remove('active');
+  }
+}
+
+function goToInventory() {
+  closeStockAlert();
+  const stockTab = document.querySelector('.tab[onclick*="stockTab"]');
+  if (stockTab) {
+    stockTab.click();
+  }
+}
+
+function updateDashboardLowStockAlerts(items) {
+    const alertContainer = document.getElementById('lowStockAlerts');
+    if (!alertContainer) return;
+
+    alertContainer.innerHTML = ''; // Limpiar sección
+
+    if (!items || items.length === 0) {
+        alertContainer.innerHTML = '<p>No hay alertas de stock bajo en este momento.</p>';
+        return;
+    }
+
+    items.forEach(item => {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert-item low-stock'; // Usar la clase low-stock
+        alertDiv.innerHTML = `
+            <div class="alert-item-info">
+                <div class="alert-item-title">${item.dispositivo}</div>
+                <div class="alert-item-details">${item.marca} ${item.modelo}</div>
+            </div>
+            <div class="alert-item-quantity">${item.cantidad}</div>
+        `;
+        alertContainer.appendChild(alertDiv);
+    });
+}
+
+function clearDashboardLowStockAlerts() {
+    const alertContainer = document.getElementById('lowStockAlerts');
+     if (alertContainer) {
+         alertContainer.innerHTML = '<p>No hay alertas de stock bajo en este momento.</p>';
+     }
+}
+
+// ========== Funciones de Búsqueda por Serie ==========
+
+function limpiarBusquedaSerie() {
+    document.getElementById('busquedaSerieEspecifica').value = '';
+    document.getElementById('resultadoSerieEspecifica').innerHTML = `
+        <p style="text-align: center; color: var(--text-secondary);">
+            Ingresa un número de serie para buscar y editar el producto
+        </p>
+    `;
+}
+
+// Función para editar producto encontrado por serie
+function editarProducto(serie) {
+    if (!serie) {
+        mostrarModal("No se puede editar: serie no válida");
+        return;
+    }
+    
+    // Buscar el producto por serie y mostrar modal de edición
+    google.script.run
+        .withSuccessHandler(function(producto) {
+            if (producto) {
+                mostrarModalEdicion(producto);
+            } else {
+                mostrarModal("No se encontró el producto con esa serie");
+            }
+        })
+        .withFailureHandler(function(error) {
+            mostrarModal("Error al buscar el producto: " + error.message);
+        })
+        .buscarProductoPorSerie(serie);
+}
+
+
+// ========== Funciones de Búsqueda por Serie y Edición ==========
+
+function buscarSerieEspecifica() {
+    const serie = document.getElementById('busquedaSerieEspecifica').value.trim();
+    const container = document.getElementById('resultadoSerieEspecifica');
+    
+    if (!serie) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 1rem; color: var(--text-secondary);">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Por favor, ingresa un número de serie para buscar.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = `
+        <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+            <p>Buscando producto con serie: <strong>${serie}</strong></p>
+        </div>
+    `;
+    
+    google.script.run
+        .withSuccessHandler(function(resultado) {
+            if (resultado) {
+                mostrarModalEdicion(resultado);
+            } else {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--danger-color);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <h4>Producto no encontrado</h4>
+                        <p>No se encontró ningún producto con la serie: <strong>${serie}</strong></p>
+                        <p><small>Verifica que el número de serie sea correcto y esté registrado en el inventario.</small></p>
+                    </div>
+                `;
+            }
+        })
+        .withFailureHandler(function(error) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: var(--danger-color);">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <h4>Error en la búsqueda</h4>
+                    <p>Error al buscar la serie: ${error.message}</p>
+                </div>
+            `;
+        })
+        .buscarProductoPorSerie(serie);
+}
+
+function mostrarModalEdicion(producto) {
+    // Cargar marcas y modelos disponibles
+    cargarMarcasParaEdicion();
+    cargarModelosParaEdicion();
+    
+    // Mostrar información del producto
+    const infoContainer = document.getElementById('infoProducto');
+    infoContainer.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+                <strong>Serie:</strong> ${producto.serie}<br>
+                <strong>Dispositivo:</strong> ${producto.dispositivo}<br>
+                <strong>Cantidad:</strong> ${producto.cantidad}
+            </div>
+            <div>
+                <strong>Marca Actual:</strong> ${producto.marca}<br>
+                <strong>Modelo Actual:</strong> ${producto.modelo}<br>
+                <strong>Fecha:</strong> ${producto.fecha || 'No disponible'}
+            </div>
+        </div>
+    `;
+    
+    // Establecer valores actuales en los campos
+    setTimeout(() => {
+        document.getElementById('editarMarca').value = producto.marca;
+        document.getElementById('editarModelo').value = producto.modelo;
+        document.getElementById('editarDescripcion').value = producto.descripcion || '';
+        
+        // Actualizar modelos cuando cambie la marca
+        document.getElementById('editarMarca').addEventListener('change', function() {
+            cargarModelosParaEdicion();
+        });
+    }, 100);
+    
+    // Configurar el formulario
+    const form = document.getElementById('formEditarProducto');
+    form.onsubmit = function(e) {
+        e.preventDefault();
+        guardarCambiosProducto(producto.serie);
+    };
+    
+    // Mostrar el modal
+    document.getElementById('editarProductoModal').style.display = 'block';
+}
+
+function cargarMarcasParaEdicion() {
+    google.script.run
+        .withSuccessHandler(function(marcas) {
+            const select = document.getElementById('editarMarca');
+            select.innerHTML = '<option value="">Selecciona una marca</option>';
+            marcas.forEach(function(marca) {
+                const option = document.createElement('option');
+                option.value = marca;
+                option.textContent = marca;
+                select.appendChild(option);
+            });
+        })
+        .withFailureHandler(function(error) {
+            console.error('Error al cargar marcas:', error);
+        })
+        .getMarcasUnicas();
+}
+
+function cargarModelosParaEdicion() {
+    google.script.run
+        .withSuccessHandler(function(modelos) {
+            const select = document.getElementById('editarModelo');
+            select.innerHTML = '<option value="">Selecciona un modelo</option>';
+            modelos.forEach(function(modelo) {
+                const option = document.createElement('option');
+                option.value = modelo;
+                option.textContent = modelo;
+                select.appendChild(option);
+            });
+        })
+        .withFailureHandler(function(error) {
+            console.error('Error al cargar modelos:', error);
+        })
+        .getModelosUnicos();
+}
+
+function guardarCambiosProducto(serie) {
+    const marca = document.getElementById('editarMarca').value;
+    const modelo = document.getElementById('editarModelo').value;
+    const descripcion = document.getElementById('editarDescripcion').value;
+    
+    if (!marca || !modelo) {
+        mostrarModal("Por favor, selecciona una marca y un modelo.");
+        return;
+    }
+    
+    const nuevosDatos = {
+        marca: marca,
+        modelo: modelo,
+        descripcion: descripcion
+    };
+    
+    google.script.run
+        .withSuccessHandler(function(resultado) {
+            mostrarModal("Producto actualizado correctamente.");
+            cerrarModalEdicion();
+            // Limpiar el campo de búsqueda
+            document.getElementById('busquedaSerieEspecifica').value = '';
+            document.getElementById('resultadoSerieEspecifica').innerHTML = `
+                <p style="text-align: center; color: var(--text-secondary);">
+                    Ingresa una serie para buscar y editar el producto
+                </p>
+            `;
+        })
+        .withFailureHandler(function(error) {
+            mostrarModal("Error al actualizar el producto: " + error.message);
+        })
+        .actualizarProductoPorSerie(serie, nuevosDatos);
+}
+
+function cerrarModalEdicion() {
+    document.getElementById('editarProductoModal').style.display = 'none';
+    // Limpiar el formulario
+    document.getElementById('formEditarProducto').reset();
+}
+
+// Búsqueda en tiempo real
+let timeoutBusqueda = null;
+
+function configurarBusquedaTiempoReal() {
+    const campos = ['busquedaSerie', 'busquedaDispositivo', 'busquedaMarca', 'busquedaModelo'];
+    
+    campos.forEach(function(campoId) {
+        const campo = document.getElementById(campoId);
+        if (campo) {
+            campo.addEventListener('input', function() {
+                clearTimeout(timeoutBusqueda);
+                timeoutBusqueda = setTimeout(function() {
+                    if (this.value.length >= 2) {
+                        buscarSerieEspecifica();
+                    }
+                }.bind(this), 500);
+            });
+        }
+    });
+}
+
+// Modal para mostrar detalles del movimiento
+function mostrarDetalleMovimiento(idMovimiento) {
+  google.script.run.withSuccessHandler(function(detalles) {
+    let html = '<div style="padding:10px 0 0 0">';
+    html += '<h2 style="text-align:center;color:#1e3a8a;margin-bottom:1rem;">Detalle del Movimiento</h2>';
+    if (detalles.length === 0) {
+      html += '<p style="text-align:center;">No se encontraron detalles.</p>';
+    } else {
+      html += `<div style="display:flex;justify-content:center;">
+        <table style="min-width:700px;max-width:900px;width:100%;border-collapse:collapse;font-size:1rem;box-shadow:0 2px 8px #0001;">
+        <thead>
+          <tr style="background:#f1f5f9;color:#1e3a8a;">
+            <th style="padding:10px 8px;text-align:left;">Producto</th>
+            <th style="padding:10px 8px;text-align:left;">Marca</th>
+            <th style="padding:10px 8px;text-align:left;">Modelo</th>
+            <th style="padding:10px 8px;text-align:left;">Serie</th>
+            <th style="padding:10px 8px;text-align:left;width:260px;">Descripción</th>
+            <th style="padding:10px 8px;text-align:center;width:80px;">Cantidad</th>
+          </tr>
+        </thead>
+        <tbody>`;
+      detalles.forEach(function(det, idx) {
+        html += `<tr style="background:${idx%2===0?'#fff':'#f8fafc'};vertical-align:top;">
+          <td style="padding:8px 8px;vertical-align:top;">${det.producto||''}</td>
+          <td style="padding:8px 8px;vertical-align:top;">${det.marca||''}</td>
+          <td style="padding:8px 8px;vertical-align:top;">${det.modelo||''}</td>
+          <td style="padding:8px 8px;vertical-align:top;">${det.serie||''}</td>
+          <td style="padding:8px 8px;vertical-align:top;background:#f8fafc;border-radius:6px;white-space:pre-line;word-break:break-word;max-width:240px;">${det.descripcion||''}</td>
+          <td style="padding:8px 8px;text-align:center;vertical-align:top;">${det.cantidad||''}</td>
+        </tr>`;
+      });
+      html += '</tbody></table></div>';
+    }
+    html += '</div>';
+    mostrarModal(html);
+  }).getDetalleMovimiento(idMovimiento);
+}
+
+function mostrarDescripcionStock(dispositivo, marca, modelo) {
+  google.script.run.withSuccessHandler(function(descripcion) {
+    let html = `<h2 style='text-align:center;color:#1e3a8a;margin-bottom:1rem;'>Descripción del Equipo</h2>`;
+    html += `<div style='padding:1rem 0;text-align:center;font-size:1.1rem;'><b>${dispositivo} ${marca} ${modelo}</b></div>`;
+    html += `<div style='background:#f8fafc;padding:1.2rem 1rem;border-radius:8px;min-height:40px;white-space:pre-line;word-break:break-word;font-size:1rem;text-align:left;'>${descripcion ? descripcion : 'Sin descripción registrada.'}</div>`;
+    mostrarModal(html);
+      }).getDescripcionPorModelo(dispositivo, marca, modelo);
+}
+
+function probarBusqueda() {
+    // Solo ejecutar si estamos en el módulo de búsqueda
+    if (!document.getElementById('busquedaTab').classList.contains('active')) {
+        return;
+    }
+    
+    const container = document.getElementById('resultadoSerieEspecifica');
+    container.innerHTML = `
+        <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+            <p>Probando conexión con la base de datos...</p>
+        </div>
+    `;
+
+    google.script.run
+        .withSuccessHandler(function(resultado) {
+            if (resultado.error) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #dc2626;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p><strong>Error:</strong> ${resultado.error}</p>
+                    </div>
+                `;
+            } else {
+                let html = `
+                    <div style="text-align: center; padding: 2rem; color: #059669;">
+                        <i class="fas fa-check-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p><strong>Conexión exitosa!</strong></p>
+                        <p>Total de filas: ${resultado.totalRows}</p>
+                        <p>Columnas encontradas: ${resultado.headers.join(', ')}</p>
+                    </div>
+                    
+                    <div style="background: #f8fafc; padding: 1.5rem; border-radius: 0.5rem; margin-top: 1rem;">
+                        <h4 style="margin-top: 0; color: #374151;">Información de Diagnóstico</h4>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div>
+                                <strong>Índices de Columnas:</strong>
+                                <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+                                    <li>Serie: ${resultado.columnIndices.serie !== -1 ? resultado.columnIndices.serie : 'No encontrada'}</li>
+                                    <li>Dispositivo: ${resultado.columnIndices.dispositivo !== -1 ? resultado.columnIndices.dispositivo : 'No encontrada'}</li>
+                                    <li>Marca: ${resultado.columnIndices.marca !== -1 ? resultado.columnIndices.marca : 'No encontrada'}</li>
+                                    <li>Modelo: ${resultado.columnIndices.modelo !== -1 ? resultado.columnIndices.modelo : 'No encontrada'}</li>
+                                    <li>Cantidad: ${resultado.columnIndices.cantidad !== -1 ? resultado.columnIndices.cantidad : 'No encontrada'}</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <strong>Ejemplos de Datos:</strong>
+                                <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+                                    <li>Series: ${resultado.examples.series.length > 0 ? resultado.examples.series.join(', ') : 'No hay datos'}</li>
+                                    <li>Dispositivos: ${resultado.examples.dispositivos.length > 0 ? resultado.examples.dispositivos.join(', ') : 'No hay datos'}</li>
+                                    <li>Marcas: ${resultado.examples.marcas.length > 0 ? resultado.examples.marcas.join(', ') : 'No hay datos'}</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div style="background: #e5e7eb; padding: 1rem; border-radius: 0.375rem; margin-top: 1rem;">
+                            <strong>Prueba de Búsqueda:</strong>
+                            <p style="margin: 0.5rem 0; font-size: 0.9rem;">Usa uno de los ejemplos de series arriba para probar la búsqueda:</p>
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                ${resultado.examples.series.map(serie => 
+                                    `<button onclick="probarBusquedaConSerie('${serie}')" class="btn-secondary" style="font-size: 0.8rem; padding: 0.25rem 0.5rem;">
+                                        Probar: ${serie}
+                                    </button>`
+                                ).join('')}
+                            </div>
+                            <div style="margin-top: 1rem;">
+                                <button onclick="obtenerTodasLasSeries()" class="btn-warning" style="font-size: 0.9rem;">
+                                    <i class="fas fa-list"></i> Ver Todas las Series Disponibles
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 1rem;">
+                        <button onclick="buscarSerieEspecifica()" class="btn-primary">
+                            <i class="fas fa-search"></i> Realizar Búsqueda Manual
+                        </button>
+                    </div>
+                `;
+                
+                container.innerHTML = html;
+            }
+        })
+        .withFailureHandler(function(error) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #dc2626;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <p><strong>Error de conexión:</strong> ${error.message || error}</p>
+                </div>
+            `;
+        })
+        .probarBusqueda();
+}
+
+function probarBusquedaConSerie(serie) {
+    // Solo ejecutar si estamos en el módulo de búsqueda
+    if (!document.getElementById('busquedaTab').classList.contains('active')) {
+        return;
+    }
+    
+    const container = document.getElementById('resultadoSerieEspecifica');
+    container.innerHTML = `
+        <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+            <p>Probando búsqueda con serie: "${serie}"...</p>
+        </div>
+    `;
+
+    const criterios = {
+        serie: serie,
+        dispositivo: "",
+        marca: "",
+        modelo: "",
+        cantidadMinima: 0,
+        cantidadMaxima: 0
+    };
+
+    google.script.run
+        .withSuccessHandler(function(resultados) {
+            if (resultados && resultados.length > 0) {
+                mostrarResultadosBusqueda(resultados);
+            } else {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #f59e0b;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p><strong>No se encontraron resultados para la serie:</strong> "${serie}"</p>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem;">Esto puede indicar un problema con la búsqueda o que la serie no existe en el inventario.</p>
+                        <button onclick="probarBusqueda()" class="btn-secondary" style="margin-top: 1rem;">
+                            <i class="fas fa-bug"></i> Volver al Diagnóstico
+                        </button>
+                    </div>
+                `;
+            }
+        })
+        .withFailureHandler(function(error) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #dc2626;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <p><strong>Error en la búsqueda:</strong> ${error.message || error}</p>
+                    <button onclick="probarBusqueda()" class="btn-secondary" style="margin-top: 1rem;">
+                        <i class="fas fa-bug"></i> Volver al Diagnóstico
+                    </button>
+                </div>
+            `;
+        })
+        .buscarInventarioAvanzado(criterios);
+}
+
+function obtenerTodasLasSeries() {
+    // Solo ejecutar si estamos en el módulo de búsqueda
+    if (!document.getElementById('busquedaTab').classList.contains('active')) {
+        return;
+    }
+    
+    const container = document.getElementById('resultadoSerieEspecifica');
+    container.innerHTML = `
+        <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+            <p>Obteniendo todas las series disponibles...</p>
+        </div>
+    `;
+
+    google.script.run
+        .withSuccessHandler(function(resultado) {
+            if (resultado.error) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #dc2626;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p><strong>Error:</strong> ${resultado.error}</p>
+                        <button onclick="probarBusqueda()" class="btn-secondary" style="margin-top: 1rem;">
+                            <i class="fas fa-bug"></i> Volver al Diagnóstico
+                        </button>
+                    </div>
+                `;
+            } else {
+                let html = `
+                    <div style="text-align: center; padding: 2rem; color: #059669;">
+                        <i class="fas fa-check-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p><strong>Series encontradas: ${resultado.totalSeries}</strong></p>
+                    </div>
+                    
+                    <div style="background: #f8fafc; padding: 1.5rem; border-radius: 0.5rem; margin-top: 1rem;">
+                        <h4 style="margin-top: 0; color: #374151;">Primeras 10 Series Disponibles:</h4>
+                        <div style="display: grid; gap: 0.5rem;">
+                `;
+                
+                resultado.series.forEach(function(item) {
+                    html += `
+                        <div style="background: white; padding: 1rem; border-radius: 0.375rem; border: 1px solid #e5e7eb;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <strong>Serie:</strong> ${item.serie}
+                                    <br><small>Fila: ${item.fila} | ${item.dispositivo} ${item.marca} ${item.modelo}</small>
+                                </div>
+                                <button onclick="probarBusquedaConSerie('${item.serie}')" class="btn-primary" style="font-size: 0.8rem; padding: 0.25rem 0.5rem;">
+                                    <i class="fas fa-search"></i> Probar
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                        <div style="text-align: center; margin-top: 1rem;">
+                            <button onclick="probarBusqueda()" class="btn-secondary">
+                                <i class="fas fa-bug"></i> Volver al Diagnóstico
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                container.innerHTML = html;
+            }
+        })
+        .withFailureHandler(function(error) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #dc2626;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <p><strong>Error:</strong> ${error.message || error}</p>
+                    <button onclick="probarBusqueda()" class="btn-secondary" style="margin-top: 1rem;">
+                        <i class="fas fa-bug"></i> Volver al Diagnóstico
+                    </button>
+                </div>
+            `;
+        })
+        .obtenerTodasLasSeries();
+}
+
+// ========== Funciones de Gestión de Marcas y Modelos ==========
+
+function agregarMarca() {
+    const nuevaMarca = document.getElementById('nuevaMarca').value.trim();
+    const estadoDiv = document.getElementById('estadoMarca');
+    
+    if (!nuevaMarca) {
+        estadoDiv.innerHTML = `
+            <div style="color: #dc2626; padding: 0.5rem; background: #fef2f2; border-radius: 0.375rem;">
+                <i class="fas fa-exclamation-triangle"></i> Por favor, ingresa el nombre de la marca
+            </div>
+        `;
+        return;
+    }
+    
+    estadoDiv.innerHTML = `
+        <div style="color: var(--text-secondary); padding: 0.5rem; background: #f8fafc; border-radius: 0.375rem;">
+            <i class="fas fa-spinner fa-spin"></i> Agregando marca a la hoja Productos...
+        </div>
+    `;
+    
+    google.script.run
+        .withSuccessHandler(function(resultado) {
+            if (resultado.error) {
+                estadoDiv.innerHTML = `
+                    <div style="color: #dc2626; padding: 0.5rem; background: #fef2f2; border-radius: 0.375rem;">
+                        <i class="fas fa-exclamation-triangle"></i> ${resultado.error}
+                    </div>
+                `;
+            } else {
+                estadoDiv.innerHTML = `
+                    <div style="color: #059669; padding: 0.5rem; background: #f0fdf4; border-radius: 0.375rem;">
+                        <i class="fas fa-check-circle"></i> ${resultado.message}
+                    </div>
+                `;
+                document.getElementById('nuevaMarca').value = '';
+                // Actualizar listas
+                cargarMarcasExistentes();
+                actualizarFiltrosDispositivos();
+            }
+        })
+        .withFailureHandler(function(error) {
+            estadoDiv.innerHTML = `
+                <div style="color: #dc2626; padding: 0.5rem; background: #fef2f2; border-radius: 0.375rem;">
+                    <i class="fas fa-exclamation-triangle"></i> Error: ${error.message || error}
+                </div>
+            `;
+        })
+        .agregarMarca(nuevaMarca);
+}
+
+function agregarModelo() {
+    const marca = document.getElementById('marcaSeleccionada').value;
+    const nuevoModelo = document.getElementById('nuevoModelo').value.trim();
+    const estadoDiv = document.getElementById('estadoModelo');
+    
+    if (!marca) {
+        estadoDiv.innerHTML = `
+            <div style="color: #dc2626; padding: 0.5rem; background: #fef2f2; border-radius: 0.375rem;">
+                <i class="fas fa-exclamation-triangle"></i> Por favor, selecciona una marca
+            </div>
+        `;
+        return;
+    }
+    
+    if (!nuevoModelo) {
+        estadoDiv.innerHTML = `
+            <div style="color: #dc2626; padding: 0.5rem; background: #fef2f2; border-radius: 0.375rem;">
+                <i class="fas fa-exclamation-triangle"></i> Por favor, ingresa el nombre del modelo
+            </div>
+        `;
+        return;
+    }
+    
+    estadoDiv.innerHTML = `
+        <div style="color: var(--text-secondary); padding: 0.5rem; background: #f8fafc; border-radius: 0.375rem;">
+            <i class="fas fa-spinner fa-spin"></i> Agregando modelo a la hoja Productos...
+        </div>
+    `;
+    
+    google.script.run
+        .withSuccessHandler(function(resultado) {
+            if (resultado.error) {
+                estadoDiv.innerHTML = `
+                    <div style="color: #dc2626; padding: 0.5rem; background: #fef2f2; border-radius: 0.375rem;">
+                        <i class="fas fa-exclamation-triangle"></i> ${resultado.error}
+                    </div>
+                `;
+            } else {
+                estadoDiv.innerHTML = `
+                    <div style="color: #059669; padding: 0.5rem; background: #f0fdf4; border-radius: 0.375rem;">
+                        <i class="fas fa-check-circle"></i> ${resultado.message}
+                    </div>
+                `;
+                document.getElementById('nuevoModelo').value = '';
+                // Actualizar listas
+                cargarModelos();
+                cargarMarcasExistentes();
+                actualizarFiltrosDispositivos();
+            }
+        })
+        .withFailureHandler(function(error) {
+            estadoDiv.innerHTML = `
+                <div style="color: #dc2626; padding: 0.5rem; background: #fef2f2; border-radius: 0.375rem;">
+                    <i class="fas fa-exclamation-triangle"></i> Error: ${error.message || error}
+                </div>
+            `;
+        })
+        .agregarModelo(marca, nuevoModelo);
+}
+
+function cargarMarcasExistentes() {
+    const container = document.getElementById('listaMarcasModelos');
+    
+    container.innerHTML = `
+        <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+            <p>Cargando marcas y modelos de la hoja Productos...</p>
+        </div>
+    `;
+    
+    google.script.run
+        .withSuccessHandler(function(marcas) {
+            if (marcas.error) {
+                container.innerHTML = `
+                    <div style="color: #dc2626; padding: 1rem; background: #fef2f2; border-radius: 0.375rem;">
+                        <i class="fas fa-exclamation-triangle"></i> ${marcas.error}
+                    </div>
+                `;
+                return;
+            }
+            
+            if (!marcas || marcas.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                        <i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p>No hay marcas registradas en la hoja Productos</p>
+                        <p>Agrega una marca usando el formulario de arriba</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '<div style="display: grid; gap: 1rem;">';
+            
+            marcas.forEach(function(marca) {
+                html += `
+                    <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid #3b82f6;">
+                        <h4 style="margin: 0 0 0.5rem 0; color: #1e3a8a;">
+                            <i class="fas fa-tag"></i> ${marca}
+                        </h4>
+                        <div id="modelos-${marca.replace(/\s+/g, '-')}" style="margin-left: 1rem;">
+                            <i class="fas fa-spinner fa-spin"></i> Cargando modelos...
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+            
+            // Cargar modelos para cada marca
+            marcas.forEach(function(marca) {
+                cargarModelosParaMarca(marca);
+            });
+        })
+        .withFailureHandler(function(error) {
+            container.innerHTML = `
+                <div style="color: #dc2626; padding: 1rem; background: #fef2f2; border-radius: 0.375rem;">
+                    <i class="fas fa-exclamation-triangle"></i> Error al cargar marcas: ${error.message || error}
+                </div>
+            `;
+        })
+        .obtenerMarcasDisponibles();
+}
+
+function cargarModelosParaMarca(marca) {
+    const containerId = `modelos-${marca.replace(/\s+/g, '-')}`;
+    const container = document.getElementById(containerId);
+    
+    google.script.run
+        .withSuccessHandler(function(modelos) {
+            if (modelos.error) {
+                container.innerHTML = `<p style="color: #dc2626;">${modelos.error}</p>`;
+                return;
+            }
+            
+            if (!modelos || modelos.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary); font-style: italic;">Sin modelos registrados para esta marca</p>';
+                return;
+            }
+            
+            let html = '<div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">';
+            modelos.forEach(function(modelo) {
+                html += `
+                    <span style="background: #e0e7ff; color: #3730a3; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem;">
+                        <i class="fas fa-cube"></i> ${modelo}
+                    </span>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        })
+        .withFailureHandler(function(error) {
+            container.innerHTML = `<p style="color: #dc2626;">Error: ${error.message || error}</p>`;
+        })
+        .obtenerModelosPorMarca(marca);
+}
+
+function cargarModelos() {
+    const marca = document.getElementById('marcaSeleccionada').value;
+    if (!marca) return;
+    
+    google.script.run
+        .withSuccessHandler(function(modelos) {
+            if (modelos.error) {
+                console.error('Error al cargar modelos:', modelos.error);
+                return;
+            }
+            
+            // Aquí podrías mostrar los modelos existentes si es necesario
+            console.log('Modelos cargados para', marca, ':', modelos);
+        })
+        .withFailureHandler(function(error) {
+            console.error('Error al cargar modelos:', error);
+        })
+        .obtenerModelosPorMarca(marca);
+}
+
+// ========== Funciones de Carga Masiva Mejorada ==========
+
+function cargarArchivo() {
+    const fileInput = document.getElementById('archivoCarga');
+    const file = fileInput.files[0];
+    const estadoDiv = document.getElementById('estadoCarga');
+    
+    if (!file) {
+        estadoDiv.innerHTML = `
+            <div style="color: #dc2626; padding: 0.75rem; background: #fef2f2; border-radius: 0.375rem;">
+                <i class="fas fa-exclamation-triangle"></i> Por favor, selecciona un archivo CSV
+            </div>
+        `;
+        return;
+    }
+    
+    estadoDiv.innerHTML = `
+        <div style="color: var(--text-secondary); padding: 0.75rem; background: #f8fafc; border-radius: 0.375rem;">
+            <i class="fas fa-spinner fa-spin"></i> Procesando archivo...
+        </div>
+    `;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const csvContent = e.target.result;
+        
+        // Pre-validar antes de procesar
+        google.script.run
+            .withSuccessHandler(function(validacion) {
+                if (validacion.error) {
+                    estadoDiv.innerHTML = `
+                        <div style="color: #dc2626; padding: 0.75rem; background: #fef2f2; border-radius: 0.375rem;">
+                            <i class="fas fa-exclamation-triangle"></i> Error en validación: ${validacion.error}
+                        </div>
+                    `;
+                    return;
+                }
+                
+                if (!validacion.valido) {
+                    let html = `
+                        <div style="color: #dc2626; padding: 0.75rem; background: #fef2f2; border-radius: 0.375rem;">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Errores de Validación</h4>
+                            <p><strong>Total de líneas:</strong> ${validacion.totalLineas}</p>
+                            <p><strong>Líneas válidas:</strong> ${validacion.lineasValidas}</p>
+                            <p><strong>Líneas con errores:</strong> ${validacion.lineasInvalidas}</p>
+                            <div style="margin-top: 1rem;">
+                                <h5>Errores encontrados:</h5>
+                                <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+                    `;
+                    
+                    validacion.errores.forEach(function(error) {
+                        html += `<li>${error}</li>`;
+                    });
+                    
+                    html += `
+                                </ul>
+                            </div>
+                            <div style="margin-top: 1rem;">
+                                <button onclick="procesarSoloValidos()" class="btn-warning">
+                                    <i class="fas fa-check"></i> Procesar Solo Líneas Válidas (${validacion.lineasValidas})
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    estadoDiv.innerHTML = html;
+                    return;
+                }
+                
+                // Si todo está válido, procesar normalmente
+                procesarCargaMasiva(csvContent);
+            })
+            .withFailureHandler(function(error) {
+                estadoDiv.innerHTML = `
+                    <div style="color: #dc2626; padding: 0.75rem; background: #fef2f2; border-radius: 0.375rem;">
+                        <i class="fas fa-exclamation-triangle"></i> Error en validación: ${error.message || error}
+                    </div>
+                `;
+            })
+            .preValidarCargaMasiva(parsearCSV(csvContent));
+    };
+    
+    reader.readAsText(file);
+}
+
+function parsearCSV(csvContent) {
+    const lineas = csvContent.split('\n');
+    const headers = lineas[0].split(',').map(h => h.trim().replace(/"/g, ''));
+    const datos = [];
+    
+    for (let i = 1; i < lineas.length; i++) {
+        if (lineas[i].trim()) {
+            const valores = lineas[i].split(',').map(v => v.trim().replace(/"/g, ''));
+            const objeto = {};
+            
+            headers.forEach((header, index) => {
+                objeto[header.toLowerCase()] = valores[index] || '';
+            });
+            
+            datos.push(objeto);
+        }
+    }
+    
+    return datos;
+}
+
+function procesarSoloValidos() {
+    // Esta función procesaría solo las líneas válidas
+    // Se implementaría según la lógica específica del sistema
+    mostrarModal("Función en desarrollo. Por favor, corrige los errores en el archivo CSV y vuelve a intentar.");
+}
+
+function diagnosticarHojasCompletas() {
+    // Solo ejecutar si estamos en el módulo de búsqueda
+    if (!document.getElementById('busquedaTab').classList.contains('active')) {
+        return;
+    }
+    
+    const container = document.getElementById('resultadoSerieEspecifica');
+    container.innerHTML = `
+        <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+            <p>Analizando todas las hojas del spreadsheet...</p>
+        </div>
+    `;
+
+    google.script.run
+        .withSuccessHandler(function(diagnostico) {
+            if (diagnostico.error) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #dc2626;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p><strong>Error en el diagnóstico:</strong> ${diagnostico.error}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div style="text-align: center; padding: 2rem; color: #059669;">
+                    <i class="fas fa-check-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <p><strong>Diagnóstico Completo del Spreadsheet</strong></p>
+                    <p><strong>Nombre:</strong> ${diagnostico.nombreSpreadsheet}</p>
+                    <p><strong>Total de hojas:</strong> ${diagnostico.totalHojas}</p>
+                    <a href="${diagnostico.url}" target="_blank" class="btn-secondary" style="margin-top: 1rem;">
+                        <i class="fas fa-external-link-alt"></i> Abrir en Drive
+                    </a>
+                </div>
+            `;
+
+            // Mostrar información de cada hoja
+            diagnostico.hojas.forEach(function(hoja) {
+                html += `
+                    <div style="background: #f8fafc; padding: 1.5rem; border-radius: 0.5rem; margin-top: 1rem; border-left: 4px solid #3b82f6;">
+                        <h4 style="margin-top: 0; color: #374151;">
+                            <i class="fas fa-table"></i> Hoja: ${hoja.nombre}
+                        </h4>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                            <div>
+                                <strong>Estadísticas:</strong>
+                                <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+                                    <li>Total filas: ${hoja.totalFilas}</li>
+                                    <li>Total columnas: ${hoja.totalColumnas}</li>
+                                    <li>Filas con datos: ${hoja.filasConDatos}</li>
+                                    <li>Tiene datos: ${hoja.tieneDatos ? 'Sí' : 'No'}</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <strong>Columnas con datos:</strong>
+                                <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+                                    ${hoja.columnasConDatos.map(col => `<li>Columna ${col + 1} (${String.fromCharCode(65 + col)})</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div style="background: #e5e7eb; padding: 1rem; border-radius: 0.375rem;">
+                            <strong>Encabezados encontrados:</strong>
+                            <p style="margin: 0.5rem 0; font-size: 0.9rem; word-break: break-all;">
+                                ${hoja.headers.length > 0 ? hoja.headers.join(' | ') : 'No hay encabezados'}
+                            </p>
+                        </div>
+                `;
+
+                // Análisis específico para la hoja Inventario
+                if (hoja.nombre === "Inventario" && hoja.analisisInventario) {
+                    const analisis = hoja.analisisInventario;
+                    html += `
+                        <div style="background: #fef3c7; padding: 1rem; border-radius: 0.375rem; margin-top: 1rem;">
+                            <strong>Análisis de Columnas de Inventario:</strong>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
+                                <div style="background: ${analisis.columnaSerie.existe ? '#d1fae5' : '#fee2e2'}; padding: 0.5rem; border-radius: 0.25rem;">
+                                    <strong>Serie:</strong> ${analisis.columnaSerie.existe ? '✓ Encontrada' : '✗ No encontrada'}
+                                    ${analisis.columnaSerie.existe ? `<br><small>Columna ${analisis.columnaSerie.indice + 1} (${String.fromCharCode(65 + analisis.columnaSerie.indice)})</small>` : ''}
+                                </div>
+                                <div style="background: ${analisis.columnaDispositivo.existe ? '#d1fae5' : '#fee2e2'}; padding: 0.5rem; border-radius: 0.25rem;">
+                                    <strong>Dispositivo:</strong> ${analisis.columnaDispositivo.existe ? '✓ Encontrada' : '✗ No encontrada'}
+                                    ${analisis.columnaDispositivo.existe ? `<br><small>Columna ${analisis.columnaDispositivo.indice + 1} (${String.fromCharCode(65 + analisis.columnaDispositivo.indice)})</small>` : ''}
+                                </div>
+                                <div style="background: ${analisis.columnaMarca.existe ? '#d1fae5' : '#fee2e2'}; padding: 0.5rem; border-radius: 0.25rem;">
+                                    <strong>Marca:</strong> ${analisis.columnaMarca.existe ? '✓ Encontrada' : '✗ No encontrada'}
+                                    ${analisis.columnaMarca.existe ? `<br><small>Columna ${analisis.columnaMarca.indice + 1} (${String.fromCharCode(65 + analisis.columnaMarca.indice)})</small>` : ''}
+                                </div>
+                                <div style="background: ${analisis.columnaModelo.existe ? '#d1fae5' : '#fee2e2'}; padding: 0.5rem; border-radius: 0.25rem;">
+                                    <strong>Modelo:</strong> ${analisis.columnaModelo.existe ? '✓ Encontrada' : '✗ No encontrada'}
+                                    ${analisis.columnaModelo.existe ? `<br><small>Columna ${analisis.columnaModelo.indice + 1} (${String.fromCharCode(65 + analisis.columnaModelo.indice)})</small>` : ''}
+                                </div>
+                                <div style="background: ${analisis.columnaCantidad.existe ? '#d1fae5' : '#fee2e2'}; padding: 0.5rem; border-radius: 0.25rem;">
+                                    <strong>Cantidad:</strong> ${analisis.columnaCantidad.existe ? '✓ Encontrada' : '✗ No encontrada'}
+                                    ${analisis.columnaCantidad.existe ? `<br><small>Columna ${analisis.columnaCantidad.indice + 1} (${String.fromCharCode(65 + analisis.columnaCantidad.indice)})</small>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Mostrar ejemplos de datos si existen
+                    if (hoja.ejemplos && hoja.ejemplos.series.length > 0) {
+                        html += `
+                            <div style="background: #ecfdf5; padding: 1rem; border-radius: 0.375rem; margin-top: 1rem;">
+                                <strong>Ejemplos de Series Disponibles:</strong>
+                                <div style="display: grid; gap: 0.5rem; margin-top: 0.5rem;">
+                                    ${hoja.ejemplos.series.map(item => `
+                                        <div style="background: white; padding: 0.75rem; border-radius: 0.25rem; border: 1px solid #d1fae5;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                                <div>
+                                                    <strong>Serie:</strong> ${item.valor}
+                                                    <br><small>Fila: ${item.fila} | ${item.dispositivo} ${item.marca} ${item.modelo}</small>
+                                                </div>
+                                                <button onclick="probarBusquedaConSerie('${item.valor}')" class="btn-primary" style="font-size: 0.8rem; padding: 0.25rem 0.5rem;">
+                                                    <i class="fas fa-search"></i> Probar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                html += `</div>`;
+            });
+
+            // Mostrar errores si los hay
+            if (diagnostico.errores && diagnostico.errores.length > 0) {
+                html += `
+                    <div style="background: #fee2e2; padding: 1.5rem; border-radius: 0.5rem; margin-top: 1rem; border-left: 4px solid #dc2626;">
+                        <h4 style="margin-top: 0; color: #991b1b;">
+                            <i class="fas fa-exclamation-triangle"></i> Errores Encontrados
+                        </h4>
+                        ${diagnostico.errores.map(error => `
+                            <div style="background: white; padding: 1rem; border-radius: 0.375rem; margin-top: 0.5rem;">
+                                <strong>Hoja:</strong> ${error.hoja}<br>
+                                <strong>Error:</strong> ${error.error}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            html += `
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button onclick="probarBusqueda()" class="btn-secondary" style="margin-right: 1rem;">
+                        <i class="fas fa-bug"></i> Diagnóstico Simple
+                    </button>
+                    <button onclick="buscarSerieEspecifica()" class="btn-primary">
+                        <i class="fas fa-search"></i> Buscar por Serie
+                    </button>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        })
+        .withFailureHandler(function(error) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #dc2626;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <p><strong>Error en el diagnóstico completo:</strong> ${error.message || error}</p>
+                    <button onclick="probarBusqueda()" class="btn-secondary" style="margin-top: 1rem;">
+                        <i class="fas fa-bug"></i> Volver al Diagnóstico Simple
+                    </button>
+                </div>
+            `;
+        })
+        .diagnosticarHojasCompletas();
+}
+
+function inicializarFormatoSeries() {
+    // Solo ejecutar si estamos en el módulo de búsqueda
+    if (!document.getElementById('busquedaTab').classList.contains('active')) {
+        return;
+    }
+    
+    const container = document.getElementById('resultadoSerieEspecifica');
+    container.innerHTML = `
+        <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+            <p>Inicializando formato de texto para las series...</p>
+        </div>
+    `;
+
+    google.script.run
+        .withSuccessHandler(function(resultado) {
+            if (resultado.error) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #dc2626;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p><strong>Error:</strong> ${resultado.error}</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #059669;">
+                        <i class="fas fa-check-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p><strong>¡Formato inicializado correctamente!</strong></p>
+                        <p>${resultado.message}</p>
+                        ${resultado.filasProcesadas ? `<p><strong>Filas procesadas:</strong> ${resultado.filasProcesadas}</p>` : ''}
+                        <div style="margin-top: 1rem;">
+                            <button onclick="probarBusqueda()" class="btn-primary">
+                                <i class="fas fa-search"></i> Probar Búsqueda Ahora
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        })
+        .withFailureHandler(function(error) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #dc2626;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <p><strong>Error al inicializar formato:</strong> ${error.message || error}</p>
+                </div>
+            `;
+        })
+        .inicializarFormatoSeries();
+}
+    </script>
+  </head>
+  <body onload="onLoad()">
+      <div id="loginModal" class="modal active">
+        <div class="modal-content">
+            <h3>Inicia sesión</h3>
+            <input type="text" id="loginUser" placeholder="Ingresa tu usuario" class="login-input">
+            <input type="password" id="loginPass" placeholder="Ingresa tu contraseña" class="login-input">
+            <div id="loginError" class="login-error" style="display: none;"></div>
+            <button onclick="login()" class="login-button">Ingresar</button>
+        </div>
+    </div>
+
+    <div id="mainInterface">
+
+    <div class="header-bar">
+  <img src="https://symgrupo.com/wp-content/uploads/2023/12/cropped-logo.png" alt="Logo">
+  S&M Inventory
+  <div class="user-info" style="margin-left:auto; display:flex; align-items:center; margin-right:30px;">
+    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="User Icon" style="width:30px; height:30px; margin-right:5px;">
+    <span id="welcomeMessage"></span>
+  </div>
+</div>
+
+    <div class="container">
+      <div class="tabs">
+            <button class="tab active" onclick="openTab(event, 'dashboardTab')">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </button>
+            <button class="tab" onclick="openTab(event, 'formularioTab')">
+                <i class="fas fa-exchange-alt"></i> Movimientos
+            </button>
+            <button class="tab" onclick="openTab(event, 'busquedaTab')">
+                <i class="fas fa-search"></i> Búsqueda por Serie
+            </button>
+            <button class="tab" onclick="openTab(event, 'stockTab')">
+                <i class="fas fa-boxes"></i> Stock Actual
+            </button>
+            <button class="tab" onclick="openTab(event, 'historialTab')">
+                <i class="fas fa-history"></i> Historial
+            </button>
+            <button class="tab" onclick="openTab(event, 'cargaMasiva')">
+                <i class="fas fa-upload"></i> Carga Masiva
+            </button>
+            <button class="tab" onclick="openTab(event, 'gestionTab')">
+                <i class="fas fa-cogs"></i> Gestión
+            </button>
+        </div>
+        <div id="dashboardTab" class="tab-content active">
+            <div class="dashboard-grid">
+                <div class="metric-card">
+                    <span class="metric-title">Stock Total</span>
+                    <span class="metric-value" id="totalStock">0</span>
+                    <div class="metric-trend">
+                        <i class="fas fa-boxes"></i>
+                        <span id="totalStockTrend">Cargando...</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-title">Productos Bajos en Stock</span>
+                    <span class="metric-value" id="lowStock">0</span>
+                    <div class="metric-trend">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span id="lowStockTrend">Cargando...</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-title">Movimientos del Mes</span>
+                    <span class="metric-value" id="monthlyMovements">0</span>
+                    <div class="metric-trend">
+                        <i class="fas fa-chart-line"></i>
+                        <span id="monthlyMovementsTrend">Cargando...</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-title">Valor Total del Inventario</span>
+                    <span class="metric-value" id="inventoryValue">$0</span>
+                    <div class="metric-trend">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span id="inventoryValueTrend">Cargando...</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-title">Productos con Serie</span>
+                    <span class="metric-value" id="productosConSerie">0</span>
+                    <div class="metric-trend">
+                        <i class="fas fa-barcode"></i>
+                        <span id="productosConSerieTrend">Cargando...</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-title">Marcas Únicas</span>
+                    <span class="metric-value" id="marcasUnicas">0</span>
+                    <div class="metric-trend">
+                        <i class="fas fa-tags"></i>
+                        <span id="marcasUnicasTrend">Cargando...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3 class="chart-title">Ventas por Plataforma</h3>
+                <div style="height: 400px;">
+                    <canvas id="salesByPlatformChart"></canvas>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Resumen de Ventas por Plataforma</h3>
+                <div id="salesSummaryTable"></div>
+            </div>
+
+            <div class="section">
+                <h3>Alertas de Stock</h3>
+                <div id="lowStockAlerts" class="alert-container">
+                    <!-- Las alertas se cargarán dinámicamente -->
+                </div>
+            </div>
+        </div>
+        <div id="formularioTab" class="tab-content active">
+        <h2>Registro de Movimientos</h2>
+        <form id="myForm" onsubmit="return submitForm();" novalidate>
+            <div class="section">
+                <label for="tipoMovimiento">Tipo de movimiento:</label>
+                <select id="tipoMovimiento" name="tipoMovimiento" onchange="toggleFields()" required>
+                    <option value="">--Selecciona--</option>
+                    <option value="Venta">Venta</option>
+                    <option value="Registro">Registro</option>
+                </select>
+            </div>
+
+            <!-- Bloque para Venta -->
+            <div id="ventaFields" class="section" style="display:none;">
+                <h3>Registro de Venta</h3>
+                <div class="form-row">
+                    <div class="half">
+                        <label for="plataforma">Plataforma:</label>
+                        <select id="plataforma" name="plataforma" required>
+                        </select>
+                    </div>
+                    <div class="half">
+                        <label for="fechaVenta">Fecha:</label>
+                        <input type="text" id="fechaVenta" name="fechaVenta" readonly>
+                    </div>
+                </div>
+                <div class="form-row">
+                  <div class="half">
+                        <label for="numeroVenta">Número de Venta:</label>
+                        <input type="text" id="numeroVenta" name="numeroVenta" required>
+                    </div>
+                    <div class="half">
+                        <label for="cantidadProductos">Número de productos:</label>
+                        <select id="cantidadProductos" name="cantidadProductos" onchange="updateProductLines()" required>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Líneas dinámicas para productos en Venta -->
+                <div id="productRow1" class="product-row">
+                    <h4>Producto 1</h4>
+                    <div class="form-row">
+                        <div class="half">
+                            <label for="serie1">Serie:</label>
+                            <input type="text" id="serie1" name="serie1" onblur="buscarSerie(1)">
+                        </div>
+                        <div class="half">
+                            <label for="cantidadVendida1">Cantidad Vendida:</label>
+                            <input type="number" id="cantidadVendida1" name="cantidadVendida1" min="1" value="1">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="half">
+                            <label for="producto1">Producto:</label>
+                            <select id="producto1" name="producto1" onchange="productoChanged(1)"></select>
+                        </div>
+                        <div class="half">
+                            <label for="marca1">Marca:</label>
+                            <select id="marca1" name="marca1"></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="half">
+                            <label for="modelo1">Modelo:</label>
+                            <select id="modelo1" name="modelo1"></select>
+                        </div>
+                    </div>
+                </div>
+                <div id="productRow2" class="product-row">
+                    <h4>Producto 2</h4>
+                    <div class="form-row">
+                        <div class="half">
+                            <label for="serie2">Serie:</label>
+                            <input type="text" id="serie2" name="serie2" onblur="buscarSerie(2)">
+                        </div>
+                        <div class="half">
+                            <label for="cantidadVendida2">Cantidad Vendida:</label>
+                            <input type="number" id="cantidadVendida2" name="cantidadVendida2" min="1" value="1">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="half">
+                            <label for="producto2">Producto:</label>
+                            <select id="producto2" name="producto2" onchange="productoChanged(2)"></select>
+                        </div>
+                        <div class="half">
+                            <label for="marca2">Marca:</label>
+                            <select id="marca2" name="marca2"></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="half">
+                            <label for="modelo2">Modelo:</label>
+                            <select id="modelo2" name="modelo2"></select>
+                        </div>
+                    </div>
+                </div>
+                <div id="productRow3" class="product-row">
+                    <h4>Producto 3</h4>
+                    <div class="form-row">
+                        <div class="half">
+                            <label for="serie3">Serie:</label>
+                            <input type="text" id="serie3" name="serie3" onblur="buscarSerie(3)">
+                        </div>
+                        <div class="half">
+                            <label for="cantidadVendida3">Cantidad Vendida:</label>
+                            <input type="number" id="cantidadVendida3" name="cantidadVendida3" min="1" value="1">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="half">
+                            <label for="producto3">Producto:</label>
+                            <select id="producto3" name="producto3" onchange="productoChanged(3)"></select>
+                        </div>
+                        <div class="half">
+                            <label for="marca3">Marca:</label>
+                            <select id="marca3" name="marca3"></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="half">
+                            <label for="modelo3">Modelo:</label>
+                            <select id="modelo3" name="modelo3"></select>
+                        </div>
+                    </div>
+                </div>
+                <div id="productRow4" class="product-row">
+                    <h4>Producto 4</h4>
+                    <div class="form-row">
+                        <div class="half">
+                            <label for="serie4">Serie:</label>
+                            <input type="text" id="serie4" name="serie4" onblur="buscarSerie(4)">
+                        </div>
+                        <div class="half">
+                            <label for="cantidadVendida4">Cantidad Vendida:</label>
+                            <input type="number" id="cantidadVendida4" name="cantidadVendida4" min="1" value="1">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="half">
+                            <label for="producto4">Producto:</label>
+                            <select id="producto4" name="producto4" onchange="productoChanged(4)"></select>
+                        </div>
+                        <div class="half">
+                            <label for="marca4">Marca:</label>
+                            <select id="marca4" name="marca4"></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="half">
+                            <label for="modelo4">Modelo:</label>
+                            <select id="modelo4" name="modelo4"></select>
+                        </div>
+                    </div>
+                </div>
+                <div id="productRow5" class="product-row">
+                    <h4>Producto 5</h4>
+                    <div class="form-row">
+                        <div class="half">
+                            <label for="serie5">Serie:</label>
+                            <input type="text" id="serie5" name="serie5" onblur="buscarSerie(5)">
+                        </div>
+                        <div class="half">
+                            <label for="cantidadVendida5">Cantidad Vendida:</label>
+                            <input type="number" id="cantidadVendida5" name="cantidadVendida5" min="1" value="1">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="half">
+                            <label for="producto5">Producto:</label>
+                            <select id="producto5" name="producto5" onchange="productoChanged(5)"></select>
+                        </div>
+                        <div class="half">
+                            <label for="marca5">Marca:</label>
+                            <select id="marca5" name="marca5"></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="half">
+                            <label for="modelo5">Modelo:</label>
+                            <select id="modelo5" name="modelo5"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Otras filas (2, 3, 4, 5) seguirán el mismo patrón. -->
+
+                <div class="form-row">
+                    <div class="half">
+                        <label for="lugar">Courier:</label>
+                        <select id="lugar" name="lugar" required></select>
+                    </div>
+                    <div class="half">
+                        <label for="boletaFactura">Boleta/Factura:</label>
+                        <select id="boletaFactura" name="boletaFactura" required>
+                            <option value="">--Selecciona--</option>
+                            <option value="Boleta">Boleta</option>
+                            <option value="Factura">Factura</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bloque para Registro -->
+            <div id="registroFields" class="section" style="display:none;">
+                <h3>Registro de Producto en Inventario</h3>
+                <div class="form-row">
+                    <div class="half">
+                        <label for="fechaRegistro">Fecha:</label>
+                        <input type="text" id="fechaRegistro" name="fechaRegistro" readonly>
+                    </div>
+                    <div class="half">
+                        <label for="serieRegistro">Serie:</label>
+                        <input type="text" id="serieRegistro" name="serieRegistro">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="half">
+                        <label for="dispositivoRegistro">Dispositivo:</label>
+                        <select id="dispositivoRegistro" name="dispositivoRegistro" onchange="registroProductoChanged()" required></select>
+                    </div>
+                    <div class="half">
+                        <label for="marcaRegistro">Marca:</label>
+                        <select id="marcaRegistro" name="marcaRegistro" required></select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="half">
+                        <label for="modeloRegistro">Modelo:</label>
+                        <select id="modeloRegistro" name="modeloRegistro" required></select>
+                    </div>
+                    <div class="half">
+                        <label for="descripcionRegistro">Descripción:</label>
+                        <textarea id="descripcionRegistro" name="descripcionRegistro" required></textarea>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="half">
+                        <label for="cantidadRegistro">Cantidad:</label>
+                        <input type="number" id="cantidadRegistro" name="cantidadRegistro" min="1" value="1" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" style="text-align:center;">
+                <button type="submit" class="submit-button">
+                    <i class="fas fa-paper-plane"></i>
+                    Enviar
+                </button>
+            </div>
+            </div>
+            <div id="stockTab" class="tab-content">
+    <h2>Stock Actual</h2>
+    <div class="filtros">
+        <select id="filtroDispositivo" onchange="loadStock()">
+            <option value="">Todos los Dispositivos</option>
+        </select>
+    </div>
+    <table class="data-table" id="stockTable">
+      <tr>
+            <th>Dispositivo</th>
+            <th>Marca</th>
+            <th>Modelo</th>
+            <th>Cantidad Total</th>
+        </tr>
+    </table>
+</div>
+        <div id="historialTab" class="tab-content">
+    <h2>Historial de Movimientos</h2>
+    <div class="filtros">
+        <select id="filtroTipo" onchange="loadHistorial()">
+            <option value="">Todos los Tipos</option>
+            <option>Venta</option>
+            <option>Registro</option>
+            <option>Cancelado</option>
+        </select>
+        <select id="filtroMes" onchange="loadHistorial()">
+            <option value="">Todos los Meses</option>
+        </select>
+        <button onclick="descargarHistorial()" class="button">Descargar CSV</button>
+    </div>
+    <table class="data-table" id="historialTable">
+      <tr>
+            <th>Fecha</th>         <!-- Col B -->
+            <th>Tipo</th>          <!-- Col Z -->
+            <th>Producto</th>      <!-- Col D -->
+            <th>Cantidad</th>      <!-- Col C -->
+            <th>N° Venta</th>      <!-- Col A -->
+            <th>Courier</th>
+            <th>Plataforma</th>
+            <th>Acciones</th>         <!-- Col X -->
+        </tr>
+    </table>
+</div>
+        <div id="busquedaTab" class="tab-content">
+            <h2><i class="fas fa-search"></i> Búsqueda por Serie</h2>
+            
+            <div class="section">
+                <h3>Buscar Producto por Número de Serie</h3>
+                <div class="form-row" style="justify-content: center;">
+                    <div class="form-group" style="max-width: 400px; width: 100%;">
+                        <label for="busquedaSerieEspecifica">Número de Serie:</label>
+                        <input type="text" id="busquedaSerieEspecifica" placeholder="Ingresa el número de serie completo..." 
+                               style="width: 100%; padding: 0.75rem; font-size: 1rem; border: 2px solid var(--border-color); border-radius: 0.5rem;">
+                    </div>
+                </div>
+                
+                <div class="form-row" style="justify-content: center; gap: 1rem; margin-top: 1.5rem;">
+                    <button onclick="buscarSerieEspecifica()" class="btn-primary" style="padding: 0.75rem 2rem; font-size: 1rem;">
+                        <i class="fas fa-search"></i> Buscar por Serie
+                    </button>
+                    <button onclick="limpiarBusquedaSerie()" class="btn-secondary" style="padding: 0.75rem 2rem; font-size: 1rem;">
+                        <i class="fas fa-times"></i> Limpiar
+                    </button>
+                </div>
+                 </div>
+            </div>
+            
+            
+            <div class="section" style="display: none;">
+                <h3>Resultado de Búsqueda</h3>
+                <div id="resultadoSerieEspecifica">
+                    <p style="text-align: center; color: var(--text-secondary);">
+                        Ingresa un número de serie para buscar y editar el producto
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="cargaMasiva" class="tab-content">
+            <h2><i class="fas fa-upload"></i> Carga Masiva de Productos</h2>
+            <div class="section">
+                <div class="form-row">
+                    <button onclick="descargarPlantilla()" class="btn-primary">
+                        <i class="fas fa-download"></i> Descargar Plantilla
+                    </button>
+                    <input type="file" id="archivoCarga" accept=".csv" style="flex: 1;">
+                    <button onclick="cargarArchivo()" class="btn-success">
+                        <i class="fas fa-upload"></i> Subir Archivo
+                    </button>
+                </div>
+                <div id="estadoCarga" style="margin-top: 1rem; padding: 0.75rem; border-radius: 0.375rem;"></div>
+            </div>
+        </div>
+
+        <div id="gestionTab" class="tab-content">
+            <h2><i class="fas fa-cogs"></i> Gestión de Marcas y Modelos</h2>
+            
+            <div class="section">
+                <h3><i class="fas fa-tags"></i> Gestión de Marcas</h3>
+                <div class="form-row">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="nuevaMarca">Nueva Marca:</label>
+                        <input type="text" id="nuevaMarca" placeholder="Ingresa el nombre de la marca">
+                    </div>
+                    <button onclick="agregarMarca()" class="btn-primary">
+                        <i class="fas fa-plus"></i> Agregar Marca
+                    </button>
+                </div>
+                <div id="estadoMarca" style="margin-top: 1rem; padding: 0.75rem; border-radius: 0.375rem;"></div>
+            </div>
+
+            <div class="section">
+                <h3><i class="fas fa-cube"></i> Gestión de Modelos</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="marcaSeleccionada">Marca:</label>
+                        <select id="marcaSeleccionada" onchange="cargarModelos()">
+                            <option value="">Selecciona una marca</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="nuevoModelo">Nuevo Modelo:</label>
+                        <input type="text" id="nuevoModelo" placeholder="Ingresa el nombre del modelo">
+                    </div>
+                    <button onclick="agregarModelo()" class="btn-primary">
+                        <i class="fas fa-plus"></i> Agregar Modelo
+                    </button>
+                </div>
+                <div id="estadoModelo" style="margin-top: 1rem; padding: 0.75rem; border-radius: 0.375rem;"></div>
+            </div>
+
+            <div class="section">
+                <h3><i class="fas fa-list"></i> Marcas y Modelos Existentes</h3>
+                <div class="form-row">
+                    <button onclick="cargarMarcasExistentes()" class="btn-secondary">
+                        <i class="fas fa-refresh"></i> Actualizar Lista
+                    </button>
+                </div>
+                <div id="listaMarcasModelos" style="margin-top: 1rem;">
+                    <p style="text-align: center; color: var(--text-secondary);">
+                        Haz clic en "Actualizar Lista" para ver las marcas y modelos existentes
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        </form>
+    </div>
+    <div id="alertModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <p id="modalMessage"></p>
+  </div>
+</div>
+
+<!-- Modal de Edición de Producto -->
+<div id="editarProductoModal" class="modal">
+  <div class="modal-content" style="max-width: 600px;">
+    <span class="close-modal" onclick="cerrarModalEdicion()">&times;</span>
+    <h2><i class="fas fa-edit"></i> Editar Producto</h2>
+    
+    <div id="infoProducto" style="margin-bottom: 1rem; padding: 1rem; background: var(--bg-secondary); border-radius: 0.375rem;">
+      <!-- Información del producto se mostrará aquí -->
+    </div>
+    
+    <form id="formEditarProducto">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="editarMarca">Marca:</label>
+          <select id="editarMarca" required>
+            <option value="">Selecciona una marca</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="editarModelo">Modelo:</label>
+          <select id="editarModelo" required>
+            <option value="">Selecciona un modelo</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="editarDescripcion">Observación:</label>
+        <textarea id="editarDescripcion" rows="3" placeholder="Ingresa observaciones sobre el producto..."></textarea>
+      </div>
+      
+      <div class="form-row" style="justify-content: flex-end; gap: 1rem; margin-top: 1rem;">
+        <button type="button" onclick="cerrarModalEdicion()" class="btn-secondary">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-save"></i> Guardar Cambios
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal de Alerta de Bajo Stock -->
+<div id="stockAlertModal" class="stock-alert-modal">
+  <div class="stock-alert-content">
+    <div class="stock-alert-header">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h2>Alerta de Bajo Stock</h2>
+    </div>
+    <ul id="stockAlertList" class="stock-alert-list">
+      <!-- Los items se agregarán dinámicamente -->
+    </ul>
+    <div class="stock-alert-actions">
+      <button class="stock-alert-button secondary" onclick="closeStockAlert()">Cerrar</button>
+      <button class="stock-alert-button primary" onclick="goToInventory()">Ir a Inventario</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

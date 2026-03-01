@@ -1,0 +1,2355 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base target="_top">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+      :root {
+        --bg: #0f172a;
+        --bg-soft: #020617;
+        --bg-elevated: #020617;
+        --primary: #2563eb;
+        --primary-soft: rgba(37, 99, 235, 0.15);
+        --accent: #22c55e;
+        --text-main: #e5e7eb;
+        --text-muted: #9ca3af;
+        --border-subtle: #1f2937;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5),
+                     0 10px 10px -5px rgba(0, 0, 0, 0.5);
+        --radius-lg: 16px;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top left, #1e293b 0, #020617 45%, #000000 100%);
+        color: var(--text-main);
+        display: flex;
+      }
+
+      /* ========== LAYOUT GENERAL ========== */
+      .sidebar {
+        width: 260px;
+        background: linear-gradient(180deg, rgba(15,23,42,0.98), rgba(15,23,42,0.92));
+        border-right: 1px solid rgba(148,163,184,0.18);
+        padding: 1.5rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        backdrop-filter: blur(18px);
+        position: fixed;
+        inset-block: 0;
+        z-index: 10;
+      }
+
+      .sidebar-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .sidebar-logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 14px;
+        background: radial-gradient(circle at 30% 20%, #60a5fa, #1d4ed8 45%, #020617 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+        box-shadow: 0 10px 30px rgba(37,99,235,0.55);
+      }
+
+      .sidebar-title {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .sidebar-title span:first-child {
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        font-size: 0.95rem;
+      }
+
+      .sidebar-title span:last-child {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+
+      .sidebar-user {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 0.75rem;
+        border-radius: 999px;
+        background: radial-gradient(circle at top left, rgba(37,99,235,0.28), rgba(15,23,42,0.8));
+        border: 1px solid rgba(37,99,235,0.5);
+      }
+
+      .sidebar-user-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+      }
+
+      .sidebar-user-info {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .sidebar-user-name {
+        font-size: 0.8rem;
+        font-weight: 500;
+      }
+
+      .sidebar-user-role {
+        font-size: 0.68rem;
+        color: var(--text-muted);
+      }
+
+      .sidebar-section-title {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: #6b7280;
+        margin: 0.75rem 0 0.25rem;
+      }
+
+      .nav-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+
+      .nav-item {
+        border-radius: 999px;
+        padding: 0.55rem 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all 0.18s ease-out;
+      }
+
+      .nav-item i {
+        width: 18px;
+        text-align: center;
+        font-size: 0.9rem;
+      }
+
+      .nav-item span {
+        flex: 1;
+      }
+
+      .nav-item small {
+        font-size: 0.65rem;
+        color: rgba(148,163,184,0.9);
+      }
+
+      .nav-item:hover {
+        background: rgba(31,41,55,0.9);
+        color: #e5e7eb;
+      }
+
+      .nav-item.active {
+        background: linear-gradient(90deg, rgba(37,99,235,0.18), rgba(37,99,235,0.05));
+        color: #e5e7eb;
+        border: 1px solid rgba(37,99,235,0.65);
+        box-shadow: 0 0 0 1px rgba(15,23,42,0.8);
+      }
+
+      .sidebar-footer {
+        margin-top: auto;
+        font-size: 0.7rem;
+        color: #6b7280;
+      }
+
+      .sidebar-footer span {
+        color: #9ca3af;
+      }
+
+      .main {
+        margin-left: 260px;
+        flex: 1;
+        padding: 1.25rem 1.75rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+      }
+
+      .top-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+
+      .top-bar-search {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: radial-gradient(circle at top left, rgba(15,23,42,0.9), rgba(15,23,42,0.96));
+        border-radius: 999px;
+        padding: 0.45rem 0.85rem;
+        border: 1px solid rgba(55,65,81,0.8);
+      }
+
+      .top-bar-search input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--text-main);
+        font-size: 0.86rem;
+      }
+
+      .top-bar-search input::placeholder {
+        color: var(--text-muted);
+      }
+
+      .top-bar-search button {
+        border: none;
+        border-radius: 999px;
+        padding: 0.45rem 0.9rem;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        cursor: pointer;
+        background: linear-gradient(135deg, #2563eb, #4f46e5);
+        color: #e5e7eb;
+        box-shadow: 0 10px 25px rgba(37,99,235,0.55);
+      }
+
+      .top-bar-search button:hover {
+        filter: brightness(1.05);
+      }
+
+      .top-bar-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .pill {
+        border-radius: 999px;
+        padding: 0.3rem 0.7rem;
+        font-size: 0.7rem;
+        border: 1px solid rgba(75,85,99,0.8);
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: rgba(15,23,42,0.9);
+      }
+
+      .pill span {
+        color: var(--accent);
+      }
+
+      /* ========== CONTENIDO PRINCIPAL ========== */
+      .page-title {
+        font-size: 1.15rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        color: #e5e7eb;
+      }
+
+      .page-subtitle {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 3fr 2fr;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+
+      .grid-full {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.6rem;
+      }
+
+      .half {
+        flex: 1;
+        min-width: 180px;
+      }
+
+      .card {
+        background: radial-gradient(circle at top left, rgba(15,23,42,0.9), rgba(15,23,42,0.98));
+        border-radius: var(--radius-lg);
+        border: 1px solid rgba(31,41,55,0.9);
+        box-shadow: var(--shadow-lg);
+        padding: 1rem 1.1rem;
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+      }
+
+      .card-title {
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+      }
+
+      .card-title i {
+        color: var(--primary);
+      }
+
+      .card-sub {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0,1fr));
+        gap: 0.75rem;
+      }
+
+      .metric {
+        border-radius: 14px;
+        border: 1px solid rgba(55,65,81,0.85);
+        padding: 0.7rem 0.75rem;
+        background: radial-gradient(circle at top left, rgba(15,23,42,0.9), rgba(15,23,42,1));
+      }
+
+      .metric-label {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+      }
+
+      .metric-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-top: 0.15rem;
+      }
+
+      .metric-hint {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        margin-top: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+
+      .metric-hint i {
+        font-size: 0.65rem;
+      }
+
+      /* Lista de últimos equipos / movimientos */
+      .list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+        max-height: 360px;
+        overflow-y: auto;
+      }
+
+      .list-item {
+        border-radius: 12px;
+        padding: 0.55rem 0.7rem;
+        border: 1px solid rgba(55,65,81,0.85);
+        background: radial-gradient(circle at top left, rgba(15,23,42,0.9), rgba(15,23,42,1));
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: all 0.16s ease-out;
+        font-size: 0.78rem;
+      }
+
+      .list-item:hover {
+        border-color: rgba(37,99,235,0.9);
+        box-shadow: 0 0 0 1px rgba(15,23,42,0.9);
+        transform: translateY(-1px);
+      }
+
+      .list-main {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+      }
+
+      .list-title {
+        font-weight: 500;
+      }
+
+      .badge {
+        border-radius: 999px;
+        padding: 0.15rem 0.55rem;
+        font-size: 0.65rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2rem;
+      }
+
+      .badge-registro {
+        background: rgba(34,197,94,0.18);
+        color: #bbf7d0;
+      }
+
+      .badge-venta {
+        background: rgba(59,130,246,0.18);
+        color: #bfdbfe;
+      }
+
+      .badge-cancelado {
+        background: rgba(239,68,68,0.18);
+        color: #fecaca;
+      }
+
+      .badge-chip {
+        background: rgba(15,23,42,0.9);
+        color: var(--text-muted);
+        border: 1px solid rgba(55,65,81,0.9);
+      }
+
+      .empty-state {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        padding: 1.1rem 0.5rem;
+        text-align: center;
+      }
+
+      /* Resultado de búsqueda por serie */
+      .search-result {
+        border-radius: 14px;
+        border: 1px solid rgba(55,65,81,0.9);
+        padding: 0.9rem 0.8rem;
+        background: radial-gradient(circle at top left, rgba(15,23,42,0.9), rgba(15,23,42,1));
+        min-height: 90px;
+      }
+
+      .search-result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.35rem;
+        font-size: 0.8rem;
+      }
+
+      .search-result-body {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(140px,1fr));
+        gap: 0.3rem 0.75rem;
+      }
+
+      .search-result-body span strong {
+        color: #e5e7eb;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        border-radius: 999px;
+        padding: 0.15rem 0.6rem;
+        border: 1px solid rgba(55,65,81,0.9);
+        font-size: 0.68rem;
+        color: var(--text-muted);
+      }
+
+      .chip i {
+        font-size: 0.68rem;
+      }
+
+      /* Modal simple */
+      .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(15,23,42,0.92);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+        backdrop-filter: blur(10px);
+      }
+
+      .modal.active {
+        display: flex;
+      }
+
+      .modal-content {
+        background: radial-gradient(circle at top left, rgba(15,23,42,0.98), rgba(15,23,42,1));
+        border-radius: 18px;
+        border: 1px solid rgba(55,65,81,0.95);
+        box-shadow: var(--shadow-lg);
+        padding: 1.25rem 1.5rem;
+        max-width: 720px;
+        width: 96%;
+        max-height: 80vh;
+        overflow-y: auto;
+        color: var(--text-main);
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+      }
+
+      .modal-header h3 {
+        font-size: 0.95rem;
+      }
+
+      .modal-close {
+        border: none;
+        background: transparent;
+        color: var(--text-muted);
+        cursor: pointer;
+      }
+
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.78rem;
+      }
+
+      .table th,
+      .table td {
+        padding: 0.5rem 0.4rem;
+        border-bottom: 1px solid rgba(31,41,55,0.9);
+        text-align: left;
+      }
+
+      .table th {
+        font-weight: 500;
+        color: var(--text-muted);
+      }
+
+      /* Login overlay */
+      #loginOverlay {
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(circle at top, #1e293b, #020617 55%, #000000 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+      }
+
+      .login-card {
+        width: 100%;
+        max-width: 360px;
+        background: radial-gradient(circle at top left, rgba(15,23,42,0.98), rgba(15,23,42,1));
+        border-radius: 20px;
+        border: 1px solid rgba(55,65,81,0.9);
+        box-shadow: var(--shadow-lg);
+        padding: 1.5rem 1.75rem 1.75rem;
+      }
+
+      .login-title {
+        font-size: 1.05rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+      }
+
+      .login-sub {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+      }
+
+      .field {
+        margin-bottom: 0.8rem;
+      }
+
+      .field label {
+        display: block;
+        font-size: 0.75rem;
+        margin-bottom: 0.25rem;
+        color: var(--text-muted);
+      }
+
+      .field input {
+        width: 100%;
+        border-radius: 999px;
+        border: 1px solid rgba(55,65,81,0.95);
+        background: rgba(15,23,42,0.98);
+        padding: 0.5rem 0.75rem;
+        color: var(--text-main);
+        font-size: 0.82rem;
+        outline: none;
+      }
+
+      .field input:focus {
+        border-color: rgba(37,99,235,0.9);
+        box-shadow: 0 0 0 1px rgba(15,23,42,0.9);
+      }
+
+      .btn-primary {
+        width: 100%;
+        border-radius: 999px;
+        border: none;
+        padding: 0.55rem 0.9rem;
+        font-size: 0.82rem;
+        font-weight: 500;
+        background: linear-gradient(135deg, #2563eb, #4f46e5);
+        color: #e5e7eb;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        box-shadow: 0 14px 30px rgba(37,99,235,0.6);
+      }
+
+      .btn-primary:hover {
+        filter: brightness(1.06);
+      }
+
+      .login-error {
+        margin-top: 0.5rem;
+        font-size: 0.72rem;
+        color: #fecaca;
+      }
+
+      @media (max-width: 900px) {
+        .sidebar {
+          display: none;
+        }
+        .main {
+          margin-left: 0;
+          padding-inline: 1rem;
+        }
+        .metrics {
+          grid-template-columns: repeat(2, minmax(0,1fr));
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+    <script>
+      let currentUser = null;
+      let productosData = [];
+
+      function login() {
+        const username = document.getElementById("loginUser").value.trim();
+        const password = document.getElementById("loginPass").value.trim();
+        const errorEl = document.getElementById("loginError");
+        errorEl.textContent = "";
+
+        if (!username || !password) {
+          errorEl.textContent = "Por favor, completa usuario y contraseña.";
+          return;
+        }
+
+        google.script.run
+          .withSuccessHandler((userData) => {
+            currentUser = userData;
+            document.getElementById("loginOverlay").style.display = "none";
+            document.getElementById("sidebarUserName").textContent = userData.name || "Usuario";
+            document.getElementById("sidebarUserRole").textContent = userData.rol || "Inventario";
+
+            // Cargar datos base de productos para movimientos/registro
+            google.script.run
+              .withSuccessHandler((data) => {
+                productosData = data || [];
+                setFechas();
+                updateRegistroProductOptions();
+                updateLugarOptions();
+                updateProductLines();
+                updatePlataformaOptions();
+              })
+              .getProductosData();
+
+            selectNav("nav-dashboard");
+          })
+          .withFailureHandler((err) => {
+            errorEl.textContent = err.message || "Error al iniciar sesión.";
+          })
+          .loginUser(username, password);
+      }
+
+      function selectNav(id) {
+        document.querySelectorAll(".nav-item").forEach((el) => el.classList.remove("active"));
+        const item = document.getElementById(id);
+        if (item) item.classList.add("active");
+
+        document.querySelectorAll(".page-section").forEach((el) => (el.style.display = "none"));
+
+        if (id === "nav-dashboard") {
+          document.getElementById("section-dashboard").style.display = "block";
+          loadDashboard();
+        } else if (id === "nav-busqueda") {
+          document.getElementById("section-search").style.display = "block";
+          loadRecentDevices();
+        } else if (id === "nav-stock") {
+          document.getElementById("section-stock").style.display = "block";
+          actualizarFiltrosDispositivos();
+          loadStock();
+        } else if (id === "nav-historial") {
+          document.getElementById("section-historial").style.display = "block";
+          llenarFiltroMeses();
+          loadHistorial();
+        } else if (id === "nav-carga") {
+          document.getElementById("section-carga").style.display = "block";
+        } else if (id === "nav-gestion") {
+          document.getElementById("section-gestion").style.display = "block";
+          cargarMarcasExistentes();
+          llenarSelectMarcasGestion();
+        }
+      }
+
+      function loadDashboard() {
+        // Métricas básicas
+        google.script.run
+          .withSuccessHandler((metricas) => {
+            if (!metricas) return;
+            document.getElementById("mTotalStock").textContent = metricas.totalStock || 0;
+            document.getElementById("mLowStock").textContent = metricas.lowStock || 0;
+            document.getElementById("mMovimientosMes").textContent = metricas.movimientosMes || 0;
+            document.getElementById("mValorInventario").textContent = "$" + (metricas.valorInventario || 0);
+          })
+          .obtenerMetricasDashboard();
+
+        // Gráfico de ventas por plataforma (por mes)
+        google.script.run
+          .withSuccessHandler((data) => {
+            if (data && data.labels && data.datasets) {
+              updateSalesByPlatformChart(data);
+            }
+          })
+          .obtenerVentasPorMesYPlataforma();
+
+        // Resumen de ventas por plataforma
+        google.script.run
+          .withSuccessHandler((data) => {
+            updateSalesSummaryTable(data);
+          })
+          .obtenerVentasPorPlataforma();
+
+        // Productos con stock bajo
+        google.script.run
+          .withSuccessHandler((items) => {
+            updateLowStockList(items);
+          })
+          .obtenerProductosStockBajo(10);
+      }
+
+      function loadRecentDevices() {
+        const list = document.getElementById("recentListSearch");
+        if (!list) return;
+        list.innerHTML = '<div class="empty-state">Cargando últimos equipos...</div>';
+
+        google.script.run
+          .withSuccessHandler((movs) => {
+            if (!movs || !movs.length) {
+              list.innerHTML = '<div class="empty-state">No hay movimientos recientes.</div>';
+              return;
+            }
+            list.innerHTML = "";
+            movs.forEach((m) => {
+              const li = document.createElement("div");
+              li.className = "list-item";
+              li.onclick = () => showMovementDetail(m.id);
+
+              const left = document.createElement("div");
+              left.className = "list-main";
+              const title = document.createElement("div");
+              title.className = "list-title";
+              title.textContent = (m.producto || "Equipo") + " · " + (m.plataforma || "Sin plataforma");
+
+              const meta = document.createElement("div");
+              meta.style.fontSize = "0.7rem";
+              meta.style.color = "var(--text-muted)";
+              meta.textContent = `${m.tipo || ""} · ${m.fecha} · N° ${m.numeroVenta || "-"}`;
+
+              left.appendChild(title);
+              left.appendChild(meta);
+
+              const right = document.createElement("div");
+              right.style.display = "flex";
+              right.style.flexDirection = "column";
+              right.style.alignItems = "flex-end";
+              right.style.gap = "0.2rem";
+
+              const badge = document.createElement("span");
+              badge.className = "badge " + (m.tipo === "Venta" ? "badge-venta" : m.tipo === "Registro" ? "badge-registro" : "badge-cancelado");
+              badge.innerHTML = `<i class="fas fa-circle"></i>${m.tipo || "Movimiento"}`;
+
+              const qty = document.createElement("span");
+              qty.className = "chip";
+              qty.innerHTML = `<i class="fas fa-box"></i>${m.cantidad || 0} u.`;
+
+              right.appendChild(badge);
+              right.appendChild(qty);
+
+              li.appendChild(left);
+              li.appendChild(right);
+              list.appendChild(li);
+            });
+          })
+          .obtenerMovimientosRecientes(30);
+      }
+
+      function updateSalesSummaryTable(data) {
+        const tableContainer = document.getElementById("dashboardResumenVentas");
+        if (!tableContainer) return;
+
+        let html = `
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Plataforma</th>
+                <th>Ventas</th>
+                <th>Canceladas</th>
+                <th>Neto</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        if (Array.isArray(data)) {
+          data.forEach((item) => {
+            html += `
+              <tr>
+                <td>${item.plataforma || ""}</td>
+                <td>${item.ventasTotales || 0}</td>
+                <td>${item.cancelaciones || 0}</td>
+                <td>${item.neto || 0}</td>
+              </tr>
+            `;
+          });
+        }
+
+        html += "</tbody></table>";
+        tableContainer.innerHTML = html;
+      }
+
+      function updateSalesByPlatformChart(data) {
+        const canvas = document.getElementById("chartVentasPlataforma");
+        if (!canvas) return;
+        const ctx = canvas.getContext("2d");
+        if (window.chartVentasPlataforma) window.chartVentasPlataforma.destroy();
+
+        const colores = ["#2563eb", "#059669", "#d97706", "#dc2626", "#7c3aed"];
+
+        data.datasets.forEach((dataset, index) => {
+          const color = colores[index % colores.length];
+          dataset.borderColor = color;
+          dataset.backgroundColor = color + "20";
+          dataset.borderWidth = 2;
+          dataset.pointRadius = 3;
+          dataset.pointHoverRadius = 5;
+          dataset.pointBackgroundColor = color;
+          dataset.pointHoverBackgroundColor = "#ffffff";
+          dataset.pointBorderColor = "#ffffff";
+          dataset.pointHoverBorderColor = color;
+          dataset.fill = true;
+          dataset.tension = 0.4;
+        });
+
+        window.chartVentasPlataforma = new Chart(ctx, {
+          type: "line",
+          data,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: "index", intersect: false },
+            plugins: {
+              legend: {
+                position: "top",
+                labels: {
+                  usePointStyle: true,
+                  padding: 12,
+                  font: { size: 11 },
+                },
+              },
+              title: {
+                display: false,
+              },
+              tooltip: {
+                backgroundColor: "rgba(15,23,42,0.96)",
+                titleColor: "#e5e7eb",
+                bodyColor: "#e5e7eb",
+                borderColor: "rgba(55,65,81,1)",
+                borderWidth: 1,
+                padding: 10,
+                displayColors: true,
+                callbacks: {
+                  label: (context) => `${context.dataset.label}: ${context.parsed.y} ventas`,
+                },
+              },
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { maxRotation: 45, minRotation: 45, font: { size: 11 } },
+              },
+              y: {
+                beginAtZero: true,
+                ticks: { stepSize: 1, font: { size: 11 } },
+                grid: { color: "rgba(30,64,175,0.35)" },
+              },
+            },
+          },
+        });
+      }
+
+      function updateLowStockList(items) {
+        const container = document.getElementById("dashboardLowStock");
+        if (!container) return;
+
+        if (!items || !items.length) {
+          container.innerHTML = '<div class="empty-state">No hay productos con stock bajo.</div>';
+          return;
+        }
+
+        container.innerHTML = "";
+        items.slice(0, 6).forEach((item) => {
+          const li = document.createElement("div");
+          li.className = "list-item";
+          const left = document.createElement("div");
+          left.className = "list-main";
+          const title = document.createElement("div");
+          title.className = "list-title";
+          title.textContent = `${item.dispositivo || ""} · ${item.marca || ""} ${item.modelo || ""}`;
+          const meta = document.createElement("div");
+          meta.style.fontSize = "0.7rem";
+          meta.style.color = "var(--text-muted)";
+          meta.textContent = item.descripcion || "Sin descripción";
+
+          left.appendChild(title);
+          left.appendChild(meta);
+
+          const right = document.createElement("div");
+          right.style.display = "flex";
+          right.style.flexDirection = "column";
+          right.style.alignItems = "flex-end";
+          right.style.gap = "0.2rem";
+
+          const qty = document.createElement("span");
+          qty.className = "chip";
+          qty.innerHTML = `<i class="fas fa-box-open"></i>${item.cantidad || 0} u.`;
+
+          const nivel = document.createElement("span");
+          nivel.className = "badge badge-cancelado";
+          nivel.textContent = item.nivel || "Bajo";
+
+          right.appendChild(qty);
+          right.appendChild(nivel);
+
+          li.appendChild(left);
+          li.appendChild(right);
+          container.appendChild(li);
+        });
+      }
+
+      function loadStock() {
+        const dispositivo = document.getElementById("filtroDispositivo").value;
+        google.script.run
+          .withSuccessHandler((stock) => {
+            const table = document.getElementById("stockTable");
+            if (!table) return;
+
+            let html = `
+              <tr>
+                <th>Dispositivo</th>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Cantidad total</th>
+              </tr>
+            `;
+
+            (stock || []).forEach((item) => {
+              html += `
+                <tr>
+                  <td>${item.dispositivo || ""}</td>
+                  <td>${item.marca || ""}</td>
+                  <td>${item.modelo || ""}</td>
+                  <td>${item.cantidad || 0}</td>
+                </tr>
+              `;
+            });
+
+            table.innerHTML = html;
+          })
+          .getStockActual(dispositivo || "");
+      }
+
+      function actualizarFiltrosDispositivos() {
+        const select = document.getElementById("filtroDispositivo");
+        if (!select) return;
+        google.script.run
+          .withSuccessHandler((dispositivos) => {
+            select.innerHTML = '<option value="">Todos los dispositivos</option>';
+            (dispositivos || []).forEach((d) => {
+              const opt = document.createElement("option");
+              opt.value = d;
+              opt.textContent = d;
+              select.appendChild(opt);
+            });
+          })
+          .getDispositivosUnicos();
+      }
+
+      function llenarFiltroMeses() {
+        const select = document.getElementById("filtroMes");
+        if (!select || select.options.length > 1) return; // ya lleno
+
+        select.innerHTML = '<option value="">Todos los meses</option>';
+        const meses = [
+          "Enero",
+          "Febrero",
+          "Marzo",
+          "Abril",
+          "Mayo",
+          "Junio",
+          "Julio",
+          "Agosto",
+          "Septiembre",
+          "Octubre",
+          "Noviembre",
+          "Diciembre",
+        ];
+        meses.forEach((nombreMes, index) => {
+          const option = document.createElement("option");
+          option.value = index + 1;
+          option.textContent = nombreMes;
+          select.appendChild(option);
+        });
+      }
+
+      function loadHistorial() {
+        const tipo = document.getElementById("filtroTipo").value;
+        const mes = document.getElementById("filtroMes").value;
+        const table = document.getElementById("historialTable");
+        if (!table) return;
+
+        table.innerHTML = `
+          <tr>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>N° Venta</th>
+            <th>Courier</th>
+            <th>Plataforma</th>
+            <th>Acciones</th>
+          </tr>
+        `;
+
+        google.script.run
+          .withSuccessHandler((historial) => {
+            (historial || []).forEach((mov) => {
+              const row = document.createElement("tr");
+              row.dataset.id = mov.id;
+              const acciones =
+                mov.tipo === "Venta"
+                  ? `<button class="btn-cancelar" data-id="${mov.id}">Cancelar</button>`
+                  : mov.tipo === "Cancelado"
+                  ? "Cancelado"
+                  : "";
+              row.innerHTML = `
+                <td>${mov.fecha || ""}</td>
+                <td>${mov.tipo || ""}</td>
+                <td>${mov.producto || ""}</td>
+                <td>${mov.cantidad || 0}</td>
+                <td>${mov.numeroVenta || ""}</td>
+                <td>${mov.lugar || ""}</td>
+                <td>${mov.plataforma || ""}</td>
+                <td>${acciones}</td>
+              `;
+              row.style.cursor = "pointer";
+              row.addEventListener("click", (e) => {
+                if (e.target && e.target.classList.contains("btn-cancelar")) {
+                  e.stopPropagation();
+                  const id = e.target.getAttribute("data-id");
+                  cancelarMovimiento(id);
+                  return;
+                }
+                showMovementDetail(mov.id);
+              });
+              table.appendChild(row);
+            });
+          })
+          .getHistorialMovimientos(tipo || "", mes || "");
+      }
+
+      function descargarHistorial() {
+        google.script.run
+          .withSuccessHandler((csv) => {
+            const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "historial.csv";
+            link.click();
+            URL.revokeObjectURL(url);
+          })
+          .exportarHistorialCSV();
+      }
+
+      function cancelarMovimiento(id) {
+        if (!id) return;
+        if (!confirm("¿Estás seguro de cancelar este movimiento?")) return;
+
+        google.script.run
+          .withSuccessHandler(() => {
+            alert("Movimiento cancelado correctamente.");
+            loadHistorial();
+            loadStock();
+          })
+          .withFailureHandler((err) => {
+            alert("Error al cancelar movimiento: " + (err.message || err));
+          })
+          .cancelarMovimiento(id);
+      }
+
+      function descargarPlantilla() {
+        const csvContent = "Serie,Dispositivo,Marca,Modelo,Descripción,Cantidad\n";
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "plantilla_carga.csv";
+        link.click();
+        URL.revokeObjectURL(url);
+      }
+
+      function cargarArchivo() {
+        const fileInput = document.getElementById("archivoCarga");
+        const estado = document.getElementById("estadoCarga");
+        if (!fileInput.files.length) {
+          mostrarEstadoCarga("Primero selecciona un archivo CSV.", true);
+          return;
+        }
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          google.script.run
+            .withSuccessHandler(() => {
+              mostrarEstadoCarga("Archivo procesado correctamente.");
+              fileInput.value = "";
+              loadStock();
+            })
+            .withFailureHandler((err) => {
+              mostrarEstadoCarga("Error al procesar el archivo: " + (err.message || err), true);
+            })
+            .procesarCargaMasiva(e.target.result);
+        };
+        reader.readAsText(file, "UTF-8");
+      }
+
+      function mostrarEstadoCarga(mensaje, esError) {
+        const estado = document.getElementById("estadoCarga");
+        if (!estado) return;
+        estado.textContent = mensaje;
+        estado.style.color = esError ? "#fecaca" : "#bbf7d0";
+      }
+
+      function agregarMarca() {
+        const nombreMarca = document.getElementById("nuevaMarca").value.trim();
+        const estadoDiv = document.getElementById("estadoMarca");
+        if (!nombreMarca) {
+          estadoDiv.textContent = "Ingresa el nombre de la marca.";
+          estadoDiv.style.color = "#fecaca";
+          return;
+        }
+        estadoDiv.textContent = "Agregando marca...";
+        estadoDiv.style.color = "var(--text-muted)";
+
+        google.script.run
+          .withSuccessHandler((resultado) => {
+            if (resultado.error) {
+              estadoDiv.textContent = resultado.error;
+              estadoDiv.style.color = "#fecaca";
+            } else {
+              estadoDiv.textContent = resultado.message;
+              estadoDiv.style.color = "#bbf7d0";
+              document.getElementById("nuevaMarca").value = "";
+              cargarMarcasExistentes();
+              llenarSelectMarcasGestion();
+            }
+          })
+          .withFailureHandler((err) => {
+            estadoDiv.textContent = "Error: " + (err.message || err);
+            estadoDiv.style.color = "#fecaca";
+          })
+          .agregarMarca(nombreMarca);
+      }
+
+      function agregarModelo() {
+        const marca = document.getElementById("marcaSeleccionada").value;
+        const nuevoModelo = document.getElementById("nuevoModelo").value.trim();
+        const estadoDiv = document.getElementById("estadoModelo");
+        if (!marca) {
+          estadoDiv.textContent = "Selecciona una marca.";
+          estadoDiv.style.color = "#fecaca";
+          return;
+        }
+        if (!nuevoModelo) {
+          estadoDiv.textContent = "Ingresa el nombre del modelo.";
+          estadoDiv.style.color = "#fecaca";
+          return;
+        }
+        estadoDiv.textContent = "Agregando modelo...";
+        estadoDiv.style.color = "var(--text-muted)";
+
+        google.script.run
+          .withSuccessHandler((resultado) => {
+            if (resultado.error) {
+              estadoDiv.textContent = resultado.error;
+              estadoDiv.style.color = "#fecaca";
+            } else {
+              estadoDiv.textContent = resultado.message;
+              estadoDiv.style.color = "#bbf7d0";
+              document.getElementById("nuevoModelo").value = "";
+              cargarMarcasExistentes();
+              cargarModelos();
+            }
+          })
+          .withFailureHandler((err) => {
+            estadoDiv.textContent = "Error: " + (err.message || err);
+            estadoDiv.style.color = "#fecaca";
+          })
+          .agregarModelo(marca, nuevoModelo);
+      }
+
+      function cargarMarcasExistentes() {
+        const container = document.getElementById("listaMarcasModelos");
+        if (!container) return;
+        container.innerHTML =
+          '<div class="empty-state">Cargando marcas y modelos desde la hoja "Productos"...</div>';
+
+        google.script.run
+          .withSuccessHandler((marcas) => {
+            if (marcas.error) {
+              container.textContent = marcas.error;
+              return;
+            }
+            if (!marcas || !marcas.length) {
+              container.innerHTML =
+                '<div class="empty-state">No hay marcas registradas aún. Agrega la primera usando el formulario.</div>';
+              return;
+            }
+            let html = '<div style="display:grid;gap:0.5rem;">';
+            marcas.forEach((marca) => {
+              const id = "modelos-" + marca.replace(/\s+/g, "-");
+              html += `
+                <div class="card" style="padding:0.6rem 0.7rem;background:rgba(15,23,42,0.9);border-radius:12px;">
+                  <div style="font-size:0.82rem;font-weight:500;margin-bottom:0.25rem;">
+                    <i class="fas fa-tag"></i> ${marca}
+                  </div>
+                  <div id="${id}" style="font-size:0.75rem;color:var(--text-muted);">
+                    Cargando modelos...
+                  </div>
+                </div>
+              `;
+            });
+            html += "</div>";
+            container.innerHTML = html;
+
+            marcas.forEach((marca) => cargarModelosParaMarca(marca));
+          })
+          .withFailureHandler((err) => {
+            container.textContent = "Error al cargar marcas: " + (err.message || err);
+          })
+          .obtenerMarcasDisponibles();
+      }
+
+      function cargarModelosParaMarca(marca) {
+        const containerId = "modelos-" + marca.replace(/\s+/g, "-");
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        google.script.run
+          .withSuccessHandler((modelos) => {
+            if (modelos.error) {
+              container.textContent = modelos.error;
+              return;
+            }
+            if (!modelos || !modelos.length) {
+              container.innerHTML =
+                '<span style="font-size:0.74rem;color:var(--text-muted);">Sin modelos registrados</span>';
+              return;
+            }
+            let html = '<div style="display:flex;flex-wrap:wrap;gap:0.35rem;">';
+            modelos.forEach((modelo) => {
+              html += `<span class="chip"><i class="fas fa-cube"></i>${modelo}</span>`;
+            });
+            html += "</div>";
+            container.innerHTML = html;
+          })
+          .withFailureHandler((err) => {
+            container.textContent = "Error al cargar modelos: " + (err.message || err);
+          })
+          .obtenerModelosPorMarca(marca);
+      }
+
+      function llenarSelectMarcasGestion() {
+        const select = document.getElementById("marcaSeleccionada");
+        if (!select) return;
+        google.script.run
+          .withSuccessHandler((marcas) => {
+            select.innerHTML = '<option value="">Selecciona una marca</option>';
+            (marcas || []).forEach((marca) => {
+              const opt = document.createElement("option");
+              opt.value = marca;
+              opt.textContent = marca;
+              select.appendChild(opt);
+            });
+          })
+          .obtenerMarcasDisponibles();
+      }
+
+      function cargarModelos() {
+        const marca = document.getElementById("marcaSeleccionada").value;
+        if (!marca) return;
+        // Aquí podrías cargar modelos específicos si quisieras mostrarlos aparte
+      }
+
+      function searchBySerie(fromTopBar = false) {
+        const inputId = fromTopBar ? "topSearchSerie" : "searchSerie";
+        const serie = document.getElementById(inputId).value.trim();
+        if (!serie) {
+          renderSerieResult(null, "Ingresa una serie para buscar.");
+          return;
+        }
+        document.getElementById("searchSerie").value = serie;
+
+        renderSerieResult(null, `Buscando serie ${serie}...`);
+
+        google.script.run
+          .withSuccessHandler((res) => {
+            if (!res) {
+              renderSerieResult(null, "No se encontró ningún equipo con esa serie.");
+              return;
+            }
+            renderSerieResult(res, null);
+          })
+          .withFailureHandler((err) => {
+            renderSerieResult(null, "Error al buscar la serie: " + (err.message || err));
+          })
+          .buscarProductoPorSerie(serie);
+      }
+
+      function renderSerieResult(producto, mensaje) {
+        const container = document.getElementById("searchResult");
+        if (mensaje) {
+          container.innerHTML = `<div class="empty-state">${mensaje}</div>`;
+          return;
+        }
+        if (!producto) {
+          container.innerHTML = '<div class="empty-state">Sin resultados.</div>';
+          return;
+        }
+        container.innerHTML = `
+          <div class="search-result-header">
+            <div>
+              <div style="font-size:0.8rem;font-weight:500;">${producto.dispositivo || "Equipo"}</div>
+              <div class="card-sub">${producto.marca || ""} ${producto.modelo || ""}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
+              <span class="chip"><i class="fas fa-barcode"></i>${producto.serie}</span>
+              <span class="chip"><i class="fas fa-box"></i>${producto.cantidad || 0} u.</span>
+            </div>
+          </div>
+          <div class="search-result-body">
+            <span><strong>Descripción:</strong> ${producto.descripcion || "Sin descripción"}</span>
+            <span><strong>Fecha ingreso:</strong> ${producto.fecha || "No disponible"}</span>
+            <span><strong>Fila en inventario:</strong> ${producto.fila || "-"}</span>
+          </div>
+        `;
+      }
+
+      function showMovementDetail(idMovimiento) {
+        const modal = document.getElementById("detailModal");
+        const body = document.getElementById("detailBody");
+        modal.classList.add("active");
+        body.innerHTML = '<div class="empty-state">Cargando detalle...</div>';
+
+        google.script.run
+          .withSuccessHandler((detalles) => {
+            if (!detalles || !detalles.length) {
+              body.innerHTML = '<div class="empty-state">No se encontraron detalles para este movimiento.</div>';
+              return;
+            }
+            let rows = detalles
+              .map(
+                (d) => `
+              <tr>
+                <td>${d.producto || ""}</td>
+                <td>${d.marca || ""}</td>
+                <td>${d.modelo || ""}</td>
+                <td>${d.serie || ""}</td>
+                <td>${d.descripcion || ""}</td>
+                <td>${d.cantidad || ""}</td>
+              </tr>`
+              )
+              .join("");
+            body.innerHTML = `
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Producto</th>
+                    <th>Marca</th>
+                    <th>Modelo</th>
+                    <th>Serie</th>
+                    <th>Descripción</th>
+                    <th>Cant.</th>
+                  </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+              </table>
+            `;
+          })
+          .getDetalleMovimiento(idMovimiento);
+      }
+
+      function closeDetailModal() {
+        document.getElementById("detailModal").classList.remove("active");
+      }
+
+      function onLoad() {
+        document.getElementById("topSearchSerie").addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            searchBySerie(true);
+          }
+        });
+        document.getElementById("searchSerie").addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            searchBySerie(false);
+          }
+        });
+      }
+    </script>
+  </head>
+  <body onload="onLoad()">
+    <!-- Login -->
+    <div id="loginOverlay">
+      <div class="login-card">
+        <div class="login-title">S&M Inventory</div>
+        <div class="login-sub">Inicia sesión para acceder al panel de inventario.</div>
+
+        <div class="field">
+          <label for="loginUser">Usuario</label>
+          <input id="loginUser" type="text" autocomplete="username" />
+        </div>
+        <div class="field">
+          <label for="loginPass">Contraseña</label>
+          <input id="loginPass" type="password" autocomplete="current-password" />
+        </div>
+
+        <button class="btn-primary" onclick="login()">
+          <i class="fas fa-arrow-right-to-bracket"></i>
+          Entrar
+        </button>
+
+        <div id="loginError" class="login-error"></div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">S&M</div>
+        <div class="sidebar-title">
+          <span>Inventory</span>
+          <span>Control de ventas · stock</span>
+        </div>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="sidebar-user-info">
+          <span id="sidebarUserName" class="sidebar-user-name">Usuario</span>
+          <span id="sidebarUserRole" class="sidebar-user-role">Inventario</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="sidebar-section-title">Principal</div>
+        <ul class="nav-list">
+          <li id="nav-dashboard" class="nav-item active" onclick="selectNav('nav-dashboard')">
+            <i class="fas fa-chart-line"></i>
+            <span>Dashboard</span>
+          </li>
+          <li id="nav-busqueda" class="nav-item" onclick="selectNav('nav-busqueda')">
+            <i class="fas fa-magnifying-glass"></i>
+            <span>Buscar equipos</span>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="sidebar-section-title">Inventario</div>
+        <ul class="nav-list">
+          <li id="nav-stock" class="nav-item" onclick="selectNav('nav-stock')">
+            <i class="fas fa-boxes-stacked"></i>
+            <span>Stock</span>
+          </li>
+          <li id="nav-historial" class="nav-item" onclick="selectNav('nav-historial')">
+            <i class="fas fa-history"></i>
+            <span>Historial</span>
+          </li>
+          <li id="nav-carga" class="nav-item" onclick="selectNav('nav-carga')">
+            <i class="fas fa-upload"></i>
+            <span>Carga masiva</span>
+          </li>
+          <li id="nav-gestion" class="nav-item" onclick="selectNav('nav-gestion')">
+            <i class="fas fa-cogs"></i>
+            <span>Gestión</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="sidebar-footer">
+        <div>S&M Inventory · <span>v2 UI</span></div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="top-bar">
+        <div class="top-bar-search">
+          <i class="fas fa-magnifying-glass" style="color:var(--text-muted);"></i>
+          <input id="topSearchSerie" type="text" placeholder="Buscar equipo por número de serie..." />
+          <button type="button" onclick="searchBySerie(true)">
+            <i class="fas fa-search"></i>
+            Buscar
+          </button>
+        </div>
+        <div class="top-bar-actions">
+          <div class="pill">
+            Última sincronización:
+            <span>en vivo</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección Dashboard -->
+      <section id="section-dashboard" class="page-section" style="display:block;">
+        <div style="margin-bottom:0.6rem;">
+          <div class="page-title">Resumen general</div>
+          <div class="page-subtitle">
+            Visión rápida de tu inventario, ventas por plataforma y alertas de stock.
+          </div>
+        </div>
+
+        <div class="grid-full">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">
+                  <i class="fas fa-gauge"></i> Indicadores clave
+                </div>
+                <div class="card-sub">Datos en tiempo real desde la hoja de cálculo.</div>
+              </div>
+            </div>
+            <div class="metrics">
+              <div class="metric">
+                <div class="metric-label">Stock total</div>
+                <div id="mTotalStock" class="metric-value">0</div>
+                <div class="metric-hint">
+                  <i class="fas fa-boxes"></i>
+                  Unidades registradas en inventario
+                </div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Productos bajos en stock</div>
+                <div id="mLowStock" class="metric-value">0</div>
+                <div class="metric-hint">
+                  <i class="fas fa-triangle-exclamation"></i>
+                  Menos de 10 unidades
+                </div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Movimientos (mes)</div>
+                <div id="mMovimientosMes" class="metric-value">0</div>
+                <div class="metric-hint">
+                  <i class="fas fa-arrows-rotate"></i>
+                  Ventas y registros
+                </div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Valor estimado</div>
+                <div id="mValorInventario" class="metric-value">$0</div>
+                <div class="metric-hint">
+                  <i class="fas fa-circle-dollar-to-slot"></i>
+                  Según configuración interna
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="grid"
+              style="margin-top:0.9rem;grid-template-columns:minmax(0,2.2fr) minmax(0,1.8fr);gap:0.75rem;align-items:stretch;"
+            >
+              <div>
+                <div class="card-header" style="padding-inline:0;">
+                  <div>
+                    <div class="card-title">
+                      <i class="fas fa-chart-line"></i> Ventas por plataforma
+                    </div>
+                    <div class="card-sub">
+                      Evolución de las ventas por canal durante los últimos meses.
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="height:230px;border-radius:14px;border:1px solid rgba(55,65,81,0.85);padding:0.4rem 0.5rem;"
+                >
+                  <canvas id="chartVentasPlataforma"></canvas>
+                </div>
+              </div>
+
+              <div>
+                <div class="card-header" style="padding-inline:0;">
+                  <div>
+                    <div class="card-title">
+                      <i class="fas fa-layer-group"></i> Resumen y alertas
+                    </div>
+                    <div class="card-sub">
+                      Rendimiento por plataforma y productos con stock bajo.
+                    </div>
+                  </div>
+                </div>
+                <div id="dashboardResumenVentas" style="margin-bottom:0.6rem;font-size:0.76rem;"></div>
+                <div id="dashboardLowStock" class="list" style="max-height:190px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección Buscador -->
+      <section id="section-search" class="page-section" style="display:none;">
+        <div style="margin-bottom:0.6rem;">
+          <div class="page-title">Buscador de equipos</div>
+          <div class="page-subtitle">
+            Consulta rápida por número de serie y revisa los últimos equipos modificados.
+          </div>
+        </div>
+
+        <div class="grid-full">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">
+                  <i class="fas fa-barcode"></i> Buscar por serie
+                </div>
+                <div class="card-sub">Ingresa una serie exacta para obtener el detalle del equipo en inventario.</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:0.5rem;margin-bottom:0.6rem;">
+              <input
+                id="searchSerie"
+                type="text"
+                placeholder="Serie completa del equipo..."
+                style="flex:1;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.45rem 0.75rem;color:var(--text-main);font-size:0.8rem;outline:none;"
+              />
+              <button
+                type="button"
+                style="border-radius:999px;border:none;padding:0.45rem 0.9rem;font-size:0.8rem;background:linear-gradient(135deg,#2563eb,#4f46e5);color:#e5e7eb;cursor:pointer;"
+                onclick="searchBySerie(false)"
+              >
+                <i class="fas fa-search"></i>
+                Buscar
+              </button>
+            </div>
+            <div id="searchResult" class="search-result">
+              <div class="empty-state">
+                Ingresa una serie para ver aquí el detalle del equipo.
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">
+                  <i class="fas fa-list"></i> Últimos equipos registrados / editados
+                </div>
+                <div class="card-sub">
+                  Lista basada en los movimientos recientes del sistema.
+                </div>
+              </div>
+            </div>
+            <div id="recentListSearch" class="list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección Movimientos -->
+      <section id="section-movimientos" class="page-section" style="display:none;">
+        <div style="margin-bottom:0.6rem;">
+          <div class="page-title">Registro de movimientos</div>
+          <div class="page-subtitle">
+            Registra ventas de equipos o ingresos al inventario usando la información de tu hoja de cálculo.
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title" style="margin-bottom:0.8rem;">
+            <i class="fas fa-exchange-alt"></i>
+            Movimientos de inventario
+          </h3>
+          <form id="myForm" onsubmit="return submitForm(event);" novalidate>
+            <div class="section" style="background:transparent;border:none;padding:0;">
+              <label for="tipoMovimiento" style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.25rem;display:block;">
+                Tipo de movimiento
+              </label>
+              <select
+                id="tipoMovimiento"
+                name="tipoMovimiento"
+                onchange="toggleFields()"
+                required
+                style="min-width:220px;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.45rem 0.75rem;color:var(--text-main);font-size:0.8rem;outline:none;"
+              >
+                <option value="">--Selecciona--</option>
+                <option value="Venta">Venta</option>
+                <option value="Registro">Registro</option>
+              </select>
+            </div>
+
+            <!-- Venta -->
+            <div id="ventaFields" style="display:none;margin-top:0.5rem;">
+              <div class="form-row">
+                <div class="half">
+                  <label for="plataforma" style="font-size:0.78rem;color:var(--text-muted);">Plataforma</label>
+                  <select
+                    id="plataforma"
+                    name="plataforma"
+                    required
+                    style="width:100%;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.4rem 0.7rem;color:var(--text-main);font-size:0.78rem;outline:none;"
+                  ></select>
+                </div>
+                <div class="half">
+                  <label for="fechaVenta" style="font-size:0.78rem;color:var(--text-muted);">Fecha</label>
+                  <input
+                    id="fechaVenta"
+                    name="fechaVenta"
+                    type="text"
+                    readonly
+                    style="width:100%;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.4rem 0.7rem;color:var(--text-main);font-size:0.78rem;outline:none;"
+                  />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="half">
+                  <label for="numeroVenta" style="font-size:0.78rem;color:var(--text-muted);">Número de venta</label>
+                  <input
+                    id="numeroVenta"
+                    name="numeroVenta"
+                    type="text"
+                    required
+                    style="width:100%;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.4rem 0.7rem;color:var(--text-main);font-size:0.78rem;outline:none;"
+                  />
+                </div>
+                <div class="half">
+                  <label for="cantidadProductos" style="font-size:0.78rem;color:var(--text-muted);"
+                    >Número de productos</label
+                  >
+                  <select
+                    id="cantidadProductos"
+                    name="cantidadProductos"
+                    onchange="updateProductLines()"
+                    required
+                    style="width:100%;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.4rem 0.7rem;color:var(--text-main);font-size:0.78rem;outline:none;"
+                  >
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Productos 1-5 -->
+              <!-- Producto 1 -->
+              <div id="productRow1" class="card" style="padding:0.75rem 0.8rem;margin-bottom:0.6rem;">
+                <div style="font-size:0.8rem;font-weight:500;margin-bottom:0.4rem;">Producto 1</div>
+                <div class="form-row">
+                  <div class="half">
+                    <label for="serie1" style="font-size:0.75rem;color:var(--text-muted);">Serie</label>
+                    <input
+                      id="serie1"
+                      name="serie1"
+                      type="text"
+                      onblur="buscarSerie(1)"
+                      style="width:100%;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.4rem 0.7rem;color:var(--text-main);font-size:0.78rem;outline:none;"
+                    />
+                  </div>
+                  <div class="half">
+                    <label for="cantidadVendida1" style="font-size:0.75rem;color:var(--text-muted);"
+                      >Cantidad vendida</label
+                    >
+                    <input
+                      id="cantidadVendida1"
+                      name="cantidadVendida1"
+                      type="number"
+                      min="1"
+                      value="1"
+                      style="width:100%;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.4rem 0.7rem;color:var(--text-main);font-size:0.78rem;outline:none;"
+                    />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="half">
+                    <label for="producto1" style="font-size:0.75rem;color:var(--text-muted);">Producto</label>
+                    <select
+                      id="producto1"
+                      name="producto1"
+                      onchange="productoChanged(1)"
+                      style="width:100%;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.4rem 0.7rem;color:var(--text-main);font-size:0.78rem;outline:none;"
+                    ></select>
+                  </div>
+                  <div class="half">
+                    <label for="marca1" style="font-size:0.75rem;color:var(--text-muted);">Marca</label>
+                    <select
+                      id="marca1"
+                      name="marca1"
+                      style="width:100%;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.4rem 0.7rem;color:var(--text-main);font-size:0.78rem;outline:none;"
+                    ></select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="half">
+                    <label for="modelo1" style="font-size:0.75rem;color:var(--text-muted);">Modelo</label>
+                    <select
+                      id="modelo1"
+                      name="modelo1"
+                      style="width:100%;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.4rem 0.7rem;color:var(--text-main);font-size:0.78rem;outline:none;"
+                    ></select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Productos 2-5 (mismo patrón, ocultos hasta que se necesiten) -->
+              <!-- Para ahorrar espacio visual, los dejamos pero se llenan con JS como en el original -->
+              <!-- Producto 2 -->
+              <div id="productRow2" class="card" style="padding:0.75rem 0.8rem;margin-bottom:0.6rem;display:none;">
+                <div style="font-size:0.8rem;font-weight:500;margin-bottom:0.4rem;">Producto 2</div>
+                <div class="form-row">
+                  <div class="half">
+                    <label for="serie2" style="font-size:0.75rem;color:var(--text-muted);">Serie</label>
+                    <input id="serie2" name="serie2" type="text" onblur="buscarSerie(2)" />
+                  </div>
+                  <div class="half">
+                    <label for="cantidadVendida2" style="font-size:0.75rem;color:var(--text-muted);"
+                      >Cantidad vendida</label
+                    >
+                    <input id="cantidadVendida2" name="cantidadVendida2" type="number" min="1" value="1" />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="half">
+                    <label for="producto2" style="font-size:0.75rem;color:var(--text-muted);">Producto</label>
+                    <select id="producto2" name="producto2" onchange="productoChanged(2)"></select>
+                  </div>
+                  <div class="half">
+                    <label for="marca2" style="font-size:0.75rem;color:var(--text-muted);">Marca</label>
+                    <select id="marca2" name="marca2"></select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="half">
+                    <label for="modelo2" style="font-size:0.75rem;color:var(--text-muted);">Modelo</label>
+                    <select id="modelo2" name="modelo2"></select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Producto 3 -->
+              <div id="productRow3" class="card" style="padding:0.75rem 0.8rem;margin-bottom:0.6rem;display:none;">
+                <div style="font-size:0.8rem;font-weight:500;margin-bottom:0.4rem;">Producto 3</div>
+                <div class="form-row">
+                  <div class="half">
+                    <label for="serie3" style="font-size:0.75rem;color:var(--text-muted);">Serie</label>
+                    <input id="serie3" name="serie3" type="text" onblur="buscarSerie(3)" />
+                  </div>
+                  <div class="half">
+                    <label for="cantidadVendida3" style="font-size:0.75rem;color:var(--text-muted);"
+                      >Cantidad vendida</label
+                    >
+                    <input id="cantidadVendida3" name="cantidadVendida3" type="number" min="1" value="1" />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="half">
+                    <label for="producto3" style="font-size:0.75rem;color:var(--text-muted);">Producto</label>
+                    <select id="producto3" name="producto3" onchange="productoChanged(3)"></select>
+                  </div>
+                  <div class="half">
+                    <label for="marca3" style="font-size:0.75rem;color:var(--text-muted);">Marca</label>
+                    <select id="marca3" name="marca3"></select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="half">
+                    <label for="modelo3" style="font-size:0.75rem;color:var(--text-muted);">Modelo</label>
+                    <select id="modelo3" name="modelo3"></select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Producto 4 -->
+              <div id="productRow4" class="card" style="padding:0.75rem 0.8rem;margin-bottom:0.6rem;display:none;">
+                <div style="font-size:0.8rem;font-weight:500;margin-bottom:0.4rem;">Producto 4</div>
+                <div class="form-row">
+                  <div class="half">
+                    <label for="serie4" style="font-size:0.75rem;color:var(--text-muted);">Serie</label>
+                    <input id="serie4" name="serie4" type="text" onblur="buscarSerie(4)" />
+                  </div>
+                  <div class="half">
+                    <label for="cantidadVendida4" style="font-size:0.75rem;color:var(--text-muted);"
+                      >Cantidad vendida</label
+                    >
+                    <input id="cantidadVendida4" name="cantidadVendida4" type="number" min="1" value="1" />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="half">
+                    <label for="producto4" style="font-size:0.75rem;color:var(--text-muted);">Producto</label>
+                    <select id="producto4" name="producto4" onchange="productoChanged(4)"></select>
+                  </div>
+                  <div class="half">
+                    <label for="marca4" style="font-size:0.75rem;color:var(--text-muted);">Marca</label>
+                    <select id="marca4" name="marca4"></select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="half">
+                    <label for="modelo4" style="font-size:0.75rem;color:var(--text-muted);">Modelo</label>
+                    <select id="modelo4" name="modelo4"></select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Producto 5 -->
+              <div id="productRow5" class="card" style="padding:0.75rem 0.8rem;margin-bottom:0.6rem;display:none;">
+                <div style="font-size:0.8rem;font-weight:500;margin-bottom:0.4rem;">Producto 5</div>
+                <div class="form-row">
+                  <div class="half">
+                    <label for="serie5" style="font-size:0.75rem;color:var(--text-muted);">Serie</label>
+                    <input id="serie5" name="serie5" type="text" onblur="buscarSerie(5)" />
+                  </div>
+                  <div class="half">
+                    <label for="cantidadVendida5" style="font-size:0.75rem;color:var(--text-muted);"
+                      >Cantidad vendida</label
+                    >
+                    <input id="cantidadVendida5" name="cantidadVendida5" type="number" min="1" value="1" />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="half">
+                    <label for="producto5" style="font-size:0.75rem;color:var(--text-muted);">Producto</label>
+                    <select id="producto5" name="producto5" onchange="productoChanged(5)"></select>
+                  </div>
+                  <div class="half">
+                    <label for="marca5" style="font-size:0.75rem;color:var(--text-muted);">Marca</label>
+                    <select id="marca5" name="marca5"></select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="half">
+                    <label for="modelo5" style="font-size:0.75rem;color:var(--text-muted);">Modelo</label>
+                    <select id="modelo5" name="modelo5"></select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="half">
+                  <label for="lugar" style="font-size:0.75rem;color:var(--text-muted);">Courier</label>
+                  <select
+                    id="lugar"
+                    name="lugar"
+                    required
+                    style="width:100%;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.4rem 0.7rem;color:var(--text-main);font-size:0.78rem;outline:none;"
+                  ></select>
+                </div>
+                <div class="half">
+                  <label for="boletaFactura" style="font-size:0.75rem;color:var(--text-muted);"
+                    >Boleta / Factura</label
+                  >
+                  <select
+                    id="boletaFactura"
+                    name="boletaFactura"
+                    required
+                    style="width:100%;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.4rem 0.7rem;color:var(--text-main);font-size:0.78rem;outline:none;"
+                  >
+                    <option value="">--Selecciona--</option>
+                    <option value="Boleta">Boleta</option>
+                    <option value="Factura">Factura</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Registro -->
+            <div id="registroFields" style="display:none;margin-top:0.5rem;">
+              <div class="form-row">
+                <div class="half">
+                  <label for="fechaRegistro" style="font-size:0.75rem;color:var(--text-muted);">Fecha</label>
+                  <input
+                    id="fechaRegistro"
+                    name="fechaRegistro"
+                    type="text"
+                    readonly
+                    style="width:100%;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.4rem 0.7rem;color:var(--text-main);font-size:0.78rem;outline:none;"
+                  />
+                </div>
+                <div class="half">
+                  <label for="serieRegistro" style="font-size:0.75rem;color:var(--text-muted);">Serie (opcional)</label>
+                  <input
+                    id="serieRegistro"
+                    name="serieRegistro"
+                    type="text"
+                    style="width:100%;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.4rem 0.7rem;color:var(--text-main);font-size:0.78rem;outline:none;"
+                  />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="half">
+                  <label for="dispositivoRegistro" style="font-size:0.75rem;color:var(--text-muted);"
+                    >Dispositivo</label
+                  >
+                  <select
+                    id="dispositivoRegistro"
+                    name="dispositivoRegistro"
+                    onchange="registroProductoChanged()"
+                    required
+                    style="width:100%;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.4rem 0.7rem;color:var(--text-main);font-size:0.78rem;outline:none;"
+                  ></select>
+                </div>
+                <div class="half">
+                  <label for="marcaRegistro" style="font-size:0.75rem;color:var(--text-muted);">Marca</label>
+                  <select
+                    id="marcaRegistro"
+                    name="marcaRegistro"
+                    required
+                    style="width:100%;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.4rem 0.7rem;color:var(--text-main);font-size:0.78rem;outline:none;"
+                  ></select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="half">
+                  <label for="modeloRegistro" style="font-size:0.75rem;color:var(--text-muted);">Modelo</label>
+                  <select
+                    id="modeloRegistro"
+                    name="modeloRegistro"
+                    required
+                    style="width:100%;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.4rem 0.7rem;color:var(--text-main);font-size:0.78rem;outline:none;"
+                  ></select>
+                </div>
+                <div class="half">
+                  <label for="descripcionRegistro" style="font-size:0.75rem;color:var(--text-muted);"
+                    >Descripción</label
+                  >
+                  <textarea
+                    id="descripcionRegistro"
+                    name="descripcionRegistro"
+                    rows="3"
+                    required
+                    style="width:100%;border-radius:12px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.45rem 0.7rem;color:var(--text-main);font-size:0.8rem;outline:none;resize:vertical;"
+                  ></textarea>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="half">
+                  <label for="cantidadRegistro" style="font-size:0.75rem;color:var(--text-muted);">Cantidad</label>
+                  <input
+                    id="cantidadRegistro"
+                    name="cantidadRegistro"
+                    type="number"
+                    min="1"
+                    value="1"
+                    required
+                    style="width:100%;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.4rem 0.7rem;color:var(--text-main);font-size:0.78rem;outline:none;"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:0.9rem;display:flex;justify-content:flex-end;">
+              <button
+                type="submit"
+                style="border-radius:999px;border:none;padding:0.5rem 1.3rem;font-size:0.8rem;background:linear-gradient(135deg,#2563eb,#4f46e5);color:#e5e7eb;cursor:pointer;display:inline-flex;align-items:center;gap:0.35rem;"
+              >
+                <i class="fas fa-paper-plane"></i>
+                Guardar movimiento
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Sección Stock actual -->
+      <section id="section-stock" class="page-section" style="display:none;">
+        <div style="margin-bottom:0.6rem;">
+          <div class="page-title">Stock actual</div>
+          <div class="page-subtitle">
+            Vista resumida del stock agrupado por dispositivo, marca y modelo.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fas fa-boxes-stacked"></i> Inventario consolidado
+            </div>
+          </div>
+          <div style="display:flex;gap:0.5rem;margin-bottom:0.6rem;">
+            <select
+              id="filtroDispositivo"
+              onchange="loadStock()"
+              style="min-width:200px;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.45rem 0.65rem;color:var(--text-main);font-size:0.8rem;outline:none;"
+            >
+              <option value="">Todos los dispositivos</option>
+            </select>
+          </div>
+          <table id="stockTable" class="table"></table>
+        </div>
+      </section>
+
+      <!-- Sección Historial -->
+      <section id="section-historial" class="page-section" style="display:none;">
+        <div style="margin-bottom:0.6rem;">
+          <div class="page-title">Historial de movimientos</div>
+          <div class="page-subtitle">
+            Consulta las ventas, registros y cancelaciones realizadas en el sistema.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fas fa-history"></i> Movimientos registrados
+            </div>
+            <div style="display:flex;gap:0.4rem;align-items:center;">
+              <select
+                id="filtroTipo"
+                onchange="loadHistorial()"
+                style="border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.3rem 0.6rem;color:var(--text-main);font-size:0.78rem;"
+              >
+                <option value="">Todos los tipos</option>
+                <option value="Venta">Venta</option>
+                <option value="Registro">Registro</option>
+                <option value="Cancelado">Cancelado</option>
+              </select>
+              <select
+                id="filtroMes"
+                onchange="loadHistorial()"
+                style="border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.3rem 0.6rem;color:var(--text-main);font-size:0.78rem;"
+              >
+                <option value="">Todos los meses</option>
+              </select>
+              <button
+                type="button"
+                onclick="descargarHistorial()"
+                style="border-radius:999px;border:none;padding:0.35rem 0.7rem;font-size:0.75rem;background:linear-gradient(135deg,#2563eb,#4f46e5);color:#e5e7eb;cursor:pointer;"
+              >
+                <i class="fas fa-download"></i>
+                CSV
+              </button>
+            </div>
+          </div>
+          <table id="historialTable" class="table"></table>
+        </div>
+      </section>
+
+      <!-- Sección Carga masiva -->
+      <section id="section-carga" class="page-section" style="display:none;">
+        <div style="margin-bottom:0.6rem;">
+          <div class="page-title">Carga masiva de productos</div>
+          <div class="page-subtitle">
+            Importa equipos desde un archivo CSV usando la plantilla estándar.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fas fa-upload"></i> Archivo CSV
+            </div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:0.6rem;align-items:center;margin-bottom:0.6rem;">
+            <button
+              type="button"
+              onclick="descargarPlantilla()"
+              style="border-radius:999px;border:none;padding:0.4rem 0.9rem;font-size:0.78rem;background:rgba(15,23,42,0.98);color:#e5e7eb;cursor:pointer;border:1px solid rgba(55,65,81,0.9);"
+            >
+              <i class="fas fa-file-arrow-down"></i>
+              Descargar plantilla
+            </button>
+            <input
+              type="file"
+              id="archivoCarga"
+              accept=".csv"
+              style="flex:1;min-width:190px;font-size:0.76rem;color:var(--text-main);"
+            />
+            <button
+              type="button"
+              onclick="cargarArchivo()"
+              style="border-radius:999px;border:none;padding:0.4rem 0.9rem;font-size:0.78rem;background:linear-gradient(135deg,#22c55e,#16a34a);color:#e5e7eb;cursor:pointer;"
+            >
+              <i class="fas fa-cloud-upload-alt"></i>
+              Subir archivo
+            </button>
+          </div>
+          <div
+            id="estadoCarga"
+            style="font-size:0.76rem;color:var(--text-muted);min-height:1.2rem;"
+          ></div>
+        </div>
+      </section>
+
+      <!-- Sección Gestión -->
+      <section id="section-gestion" class="page-section" style="display:none;">
+        <div style="margin-bottom:0.6rem;">
+          <div class="page-title">Gestión de marcas y modelos</div>
+          <div class="page-subtitle">
+            Administra las opciones maestras que se usan al registrar productos y ventas.
+          </div>
+        </div>
+
+        <div class="grid-full">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fas fa-tags"></i> Marcas
+              </div>
+            </div>
+            <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;align-items:center;">
+              <input
+                id="nuevaMarca"
+                type="text"
+                placeholder="Nueva marca..."
+                style="flex:1;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.45rem 0.75rem;color:var(--text-main);font-size:0.8rem;outline:none;"
+              />
+              <button
+                type="button"
+                onclick="agregarMarca()"
+                style="border-radius:999px;border:none;padding:0.4rem 0.9rem;font-size:0.78rem;background:linear-gradient(135deg,#2563eb,#4f46e5);color:#e5e7eb;cursor:pointer;"
+              >
+                <i class="fas fa-plus"></i>
+                Agregar
+              </button>
+            </div>
+            <div id="estadoMarca" style="font-size:0.76rem;color:var(--text-muted);min-height:1.1rem;"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fas fa-cube"></i> Modelos
+              </div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.5rem;align-items:center;">
+              <select
+                id="marcaSeleccionada"
+                onchange="cargarModelos()"
+                style="min-width:180px;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.4rem 0.65rem;color:var(--text-main);font-size:0.78rem;outline:none;"
+              >
+                <option value="">Selecciona una marca</option>
+              </select>
+              <input
+                id="nuevoModelo"
+                type="text"
+                placeholder="Nuevo modelo..."
+                style="flex:1;min-width:160px;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:rgba(15,23,42,0.98);padding:0.45rem 0.75rem;color:var(--text-main);font-size:0.8rem;outline:none;"
+              />
+              <button
+                type="button"
+                onclick="agregarModelo()"
+                style="border-radius:999px;border:none;padding:0.4rem 0.9rem;font-size:0.78rem;background:linear-gradient(135deg,#22c55e,#16a34a);color:#e5e7eb;cursor:pointer;"
+              >
+                <i class="fas fa-plus"></i>
+                Agregar modelo
+              </button>
+            </div>
+            <div id="estadoModelo" style="font-size:0.76rem;color:var(--text-muted);min-height:1.1rem;"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fas fa-list"></i> Marcas y modelos existentes
+              </div>
+              <button
+                type="button"
+                onclick="cargarMarcasExistentes()"
+                style="border-radius:999px;border:none;padding:0.35rem 0.8rem;font-size:0.75rem;background:rgba(15,23,42,0.98);color:#e5e7eb;cursor:pointer;border:1px solid rgba(55,65,81,0.9);"
+              >
+                <i class="fas fa-rotate"></i>
+                Actualizar
+              </button>
+            </div>
+            <div id="listaMarcasModelos" style="font-size:0.78rem;"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal de detalle de movimiento -->
+    <div id="detailModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3><i class="fas fa-clipboard-list"></i> Detalle del movimiento</h3>
+          <button class="modal-close" onclick="closeDetailModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div id="detailBody"></div>
+      </div>
+    </div>
+  </body>
+</html>
+
