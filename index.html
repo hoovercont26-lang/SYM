@@ -9,15 +9,15 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
       :root {
-        --bg: #0f172a;
-        --bg-soft: #020617;
-        --bg-elevated: #020617;
+        --bg: #111827;
+        --bg-soft: #0b1120;
+        --bg-elevated: #0f172a;
         --primary: #2563eb;
-        --primary-soft: rgba(37, 99, 235, 0.15);
-        --accent: #22c55e;
-        --text-main: #e5e7eb;
-        --text-muted: #9ca3af;
-        --border-subtle: #1f2937;
+        --primary-soft: rgba(37, 99, 235, 0.2);
+        --accent: #14b8a6;
+        --text-main: #f1f5f9;
+        --text-muted: #94a3b8;
+        --border-subtle: #334155;
         --danger: #ef4444;
         --warning: #f59e0b;
         --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5),
@@ -34,7 +34,7 @@
       body {
         min-height: 100vh;
         font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: radial-gradient(circle at top left, #1e293b 0, #020617 45%, #000000 100%);
+        background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 40%, #f8fafc 100%);
         color: var(--text-main);
         display: flex;
       }
@@ -42,7 +42,7 @@
       /* ========== LAYOUT GENERAL ========== */
       .sidebar {
         width: 260px;
-        background: linear-gradient(180deg, rgba(15,23,42,0.98), rgba(15,23,42,0.92));
+        background: linear-gradient(180deg, rgba(15,23,42,0.95), rgba(30,41,59,0.92));
         border-right: 1px solid rgba(148,163,184,0.18);
         padding: 1.5rem 1.25rem;
         display: flex;
@@ -170,12 +170,12 @@
 
       .nav-item:hover {
         background: rgba(31,41,55,0.9);
-        color: #e5e7eb;
+        color: #f8fafc;
       }
 
       .nav-item.active {
         background: linear-gradient(90deg, rgba(37,99,235,0.18), rgba(37,99,235,0.05));
-        color: #e5e7eb;
+        color: #f8fafc;
         border: 1px solid rgba(37,99,235,0.65);
         box-shadow: 0 0 0 1px rgba(15,23,42,0.8);
       }
@@ -240,7 +240,7 @@
         gap: 0.35rem;
         cursor: pointer;
         background: linear-gradient(135deg, #2563eb, #4f46e5);
-        color: #e5e7eb;
+        color: #f8fafc;
         box-shadow: 0 10px 25px rgba(37,99,235,0.55);
       }
 
@@ -292,7 +292,7 @@
         font-size: 1.15rem;
         font-weight: 600;
         letter-spacing: 0.04em;
-        color: #e5e7eb;
+        color: #f8fafc;
       }
 
       .page-subtitle {
@@ -326,7 +326,7 @@
       }
 
       .card {
-        background: radial-gradient(circle at top left, rgba(15,23,42,0.9), rgba(15,23,42,0.98));
+        background: linear-gradient(160deg, rgba(15,23,42,0.96), rgba(30,41,59,0.96));
         border-radius: var(--radius-lg);
         border: 1px solid rgba(31,41,55,0.9);
         box-shadow: var(--shadow-lg);
@@ -489,6 +489,31 @@
         background: rgba(2,6,23,0.65);
       }
 
+      .chart-shell {
+        height: 320px;
+        border-radius: 14px;
+        border: 1px solid rgba(71, 85, 105, 0.7);
+        background: linear-gradient(160deg, rgba(15, 23, 42, 0.86), rgba(30, 41, 59, 0.95));
+        padding: 0.5rem;
+        position: relative;
+      }
+
+      .chart-shell canvas {
+        width: 100% !important;
+        height: 100% !important;
+      }
+
+      .chart-empty {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        pointer-events: none;
+      }
+
       .toast {
         position: fixed;
         right: 1rem;
@@ -539,7 +564,7 @@
       }
 
       .search-result-body span strong {
-        color: #e5e7eb;
+        color: #f8fafc;
       }
 
       .chip {
@@ -690,7 +715,7 @@
         font-size: 0.82rem;
         font-weight: 500;
         background: linear-gradient(135deg, #2563eb, #4f46e5);
-        color: #e5e7eb;
+        color: #f8fafc;
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -944,43 +969,55 @@
         });
       }
 
+      function getCatalogValues(field) {
+        return [...new Set((productosData || []).map((p) => (p[field] || "").trim()).filter(Boolean))];
+      }
+
+      function setSelectOptions(select, values, selectedValue = "") {
+        if (!select) return;
+        const uniqueValues = [...new Set((values || []).filter(Boolean))];
+        select.innerHTML = '<option value="">--Selecciona--</option>';
+
+        uniqueValues.forEach((value) => {
+          const opt = document.createElement("option");
+          opt.value = value;
+          opt.textContent = value;
+          select.appendChild(opt);
+        });
+
+        if (selectedValue) {
+          if (!uniqueValues.includes(selectedValue)) {
+            const extra = document.createElement("option");
+            extra.value = selectedValue;
+            extra.textContent = selectedValue;
+            select.appendChild(extra);
+          }
+          select.value = selectedValue;
+        }
+      }
+
       function updateProductOptions(line) {
         const select = document.getElementById("producto" + line);
         if (!select) return;
-        const productos = [...new Set((productosData || []).map((p) => (p.producto || "").trim()).filter(Boolean))];
-        select.innerHTML = '<option value="">--Selecciona--</option>';
-        productos.forEach((p) => {
-          const opt = document.createElement("option");
-          opt.value = p;
-          opt.textContent = p;
-          select.appendChild(opt);
-        });
+        setSelectOptions(select, getCatalogValues("producto"), select.value || "");
       }
 
-      function productoChanged(line) {
-        const producto = document.getElementById("producto" + line)?.value;
+      function productoChanged(line, selectedMarca = "", selectedModelo = "") {
         const marcaSelect = document.getElementById("marca" + line);
+        if (!marcaSelect) return;
+        const marcaValue = selectedMarca || marcaSelect.value || "";
+
+        // La hoja Productos se carga en vertical por columnas (A/B/C), por lo que
+        // las marcas/modelos deben estar disponibles completas y no bloqueadas por fila.
+        setSelectOptions(marcaSelect, getCatalogValues("marca"), marcaValue);
+        marcaChanged(line, selectedModelo);
+      }
+
+      function marcaChanged(line, selectedModelo = "") {
         const modeloSelect = document.getElementById("modelo" + line);
-        if (!marcaSelect || !modeloSelect) return;
-
-        const filtered = (productosData || []).filter((p) => !producto || p.producto === producto);
-        const marcas = [...new Set(filtered.map((p) => (p.marca || "").trim()).filter(Boolean))];
-        const modelos = [...new Set(filtered.map((p) => (p.modelo || "").trim()).filter(Boolean))];
-
-        marcaSelect.innerHTML = '<option value="">--Selecciona--</option>';
-        modeloSelect.innerHTML = '<option value="">--Selecciona--</option>';
-        marcas.forEach((m) => {
-          const opt = document.createElement("option");
-          opt.value = m;
-          opt.textContent = m;
-          marcaSelect.appendChild(opt);
-        });
-        modelos.forEach((m) => {
-          const opt = document.createElement("option");
-          opt.value = m;
-          opt.textContent = m;
-          modeloSelect.appendChild(opt);
-        });
+        if (!modeloSelect) return;
+        const modeloValue = selectedModelo || modeloSelect.value || "";
+        setSelectOptions(modeloSelect, getCatalogValues("modelo"), modeloValue);
       }
 
       function updateProductLines() {
@@ -989,7 +1026,14 @@
           const row = document.getElementById("productRow" + i);
           if (!row) continue;
           row.style.display = i <= count ? "block" : "none";
-          if (i <= count) updateProductOptions(i);
+          if (i <= count) {
+            updateProductOptions(i);
+            productoChanged(i);
+            const marcaSelect = document.getElementById("marca" + i);
+            if (marcaSelect) {
+              marcaSelect.onchange = () => marcaChanged(i);
+            }
+          }
         }
       }
 
@@ -1021,14 +1065,19 @@
         if (!input || !input.value.trim()) return;
         google.script.run
           .withSuccessHandler((res) => {
-            if (!res) return;
             const p = document.getElementById("producto" + line);
-            const ma = document.getElementById("marca" + line);
-            const mo = document.getElementById("modelo" + line);
             const c = document.getElementById("cantidadVendida" + line);
-            if (p) p.value = res.dispositivo || "";
-            if (ma) ma.value = res.marca || "";
-            if (mo) mo.value = res.modelo || "";
+
+            if (!res) {
+              if (c) c.readOnly = false;
+              showToast("No encontramos la serie en inventario.", true);
+              return;
+            }
+
+            if (p) {
+              p.value = res.dispositivo || "";
+              productoChanged(line, res.marca || "", res.modelo || "");
+            }
             if (c) {
               c.value = 1;
               c.readOnly = true;
@@ -1192,13 +1241,22 @@
 
       function updateSalesByPlatformChart(data) {
         const canvas = document.getElementById("chartVentasPlataforma");
+        const empty = document.getElementById("chartVentasPlataformaEmpty");
         if (!canvas) return;
         const ctx = canvas.getContext("2d");
         if (window.chartVentasPlataforma) window.chartVentasPlataforma.destroy();
 
-        const colores = ["#2563eb", "#059669", "#d97706", "#dc2626", "#7c3aed"];
+        const chartData = {
+          labels: Array.isArray(data?.labels) && data.labels.length ? data.labels : ["Sin datos"],
+          datasets: Array.isArray(data?.datasets) ? data.datasets : []
+        };
 
-        data.datasets.forEach((dataset, index) => {
+        const hasData = chartData.datasets.length > 0;
+        if (empty) empty.style.display = hasData ? "none" : "flex";
+
+        const colores = ["#3b82f6", "#14b8a6", "#f59e0b", "#f43f5e", "#8b5cf6"];
+
+        chartData.datasets.forEach((dataset, index) => {
           const color = colores[index % colores.length];
           dataset.borderColor = color;
           dataset.backgroundColor = color + "20";
@@ -1215,7 +1273,7 @@
 
         window.chartVentasPlataforma = new Chart(ctx, {
           type: "line",
-          data,
+          data: chartData,
           options: {
             responsive: true,
             maintainAspectRatio: false,
@@ -1227,6 +1285,7 @@
                   usePointStyle: true,
                   padding: 12,
                   font: { size: 11 },
+                  color: "#cbd5e1",
                 },
               },
               title: {
@@ -1248,12 +1307,12 @@
             scales: {
               x: {
                 grid: { display: false },
-                ticks: { maxRotation: 45, minRotation: 45, font: { size: 11 } },
+                ticks: { maxRotation: 45, minRotation: 45, font: { size: 11 }, color: "#cbd5e1" },
               },
               y: {
                 beginAtZero: true,
-                ticks: { stepSize: 1, font: { size: 11 } },
-                grid: { color: "rgba(30,64,175,0.35)" },
+                ticks: { stepSize: 1, font: { size: 11 }, color: "#cbd5e1" },
+                grid: { color: "rgba(51,65,85,0.6)" },
               },
             },
           },
@@ -1969,10 +2028,11 @@
                     </div>
                   </div>
                 </div>
-                <div
-                  style="height:230px;border-radius:14px;border:1px solid rgba(55,65,81,0.85);padding:0.4rem 0.5rem;"
-                >
+                <div class="chart-shell">
                   <canvas id="chartVentasPlataforma"></canvas>
+                  <div id="chartVentasPlataformaEmpty" class="chart-empty" style="display:none;">
+                    Aún no hay ventas registradas para mostrar el gráfico.
+                  </div>
                 </div>
               </div>
 
