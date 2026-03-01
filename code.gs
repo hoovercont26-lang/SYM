@@ -128,18 +128,32 @@ function obtenerTodasLasSeries() {
 function getProductosData() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName('Productos');
-  var data = sheet.getDataRange().getValues();
-  data.shift(); // quitar encabezado
-  var productos = data.map(function(row) {
-    return {
-      producto: row[0],
-      marca: row[1],
-      modelo: row[2],
-      plataforma: row[4],
-      lugar: row[3] || ""
-    };
-  });
-  return productos;
+  if (!sheet) {
+    return [];
+  }
+
+  var lastRow = sheet.getLastRow();
+  if (lastRow <= 1) {
+    return [];
+  }
+
+  // Lectura vertical real por columnas:
+  // A: Productos, B: Marcas, C: Modelos, D: Lugar, E: Plataforma.
+  var data = sheet.getRange(2, 1, lastRow - 1, 5).getValues();
+
+  return data
+    .map(function(row) {
+      return {
+        producto: (row[0] || "").toString().trim(),
+        marca: (row[1] || "").toString().trim(),
+        modelo: (row[2] || "").toString().trim(),
+        lugar: (row[3] || "").toString().trim(),
+        plataforma: (row[4] || "").toString().trim()
+      };
+    })
+    .filter(function(item) {
+      return item.producto || item.marca || item.modelo || item.lugar || item.plataforma;
+    });
 }
 
 /**
